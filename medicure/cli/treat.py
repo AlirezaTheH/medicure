@@ -1,6 +1,5 @@
 from typing import Dict, List, Optional
 
-import tmdbsimple as tmdb
 import typer
 
 from medicure.cli.base import app
@@ -11,9 +10,8 @@ from medicure.cli.utils import (
     load_collection_info,
     load_tmdb_info,
 )
+from medicure.core import Medicure
 from medicure.data_structures import DubbingSupplier
-from medicure.media import Medicure
-from medicure.subtitle import Subcure
 
 treat_app = typer.Typer()
 app.add_typer(treat_app, name='treat')
@@ -117,10 +115,9 @@ def treat_media(
     Fixes video source, audio source, file name and language for
     all tracks.
     """
-    tmdb.API_KEY = load_tmdb_info()['api_key']
-    medicure = Medicure(**load_collection_info())
+    medicure = Medicure(load_tmdb_info()['api_key'], **load_collection_info())
     try:
-        medicure.treat(
+        medicure.treat_media(
             imdb_id,
             file_search_pattern_to_id,
             video_language_code,
@@ -140,8 +137,14 @@ def treat_subtitle(
     imdb_id: str = typer.Argument(
         ..., help=create_param_help(': str', 'IMDB id')
     ),
-    file_search_pattern: str = typer.Argument(
-        ..., help=create_param_help(': str', 'Pattern for finding files')
+    file_search_pattern_to_id: Dict[str, int] = typer.Argument(
+        ...,
+        param_type=Json,
+        help=create_param_help(
+            ': dict[str, int]',
+            'Dict of patterns for finding files to file ids',
+            'You can pass a json like string for this argument.',
+        ),
     ),
     language_code: str = typer.Argument(
         ...,
@@ -195,12 +198,11 @@ def treat_subtitle(
     """
     Fixes subtitle source, file name and language.
     """
-    tmdb.API_KEY = load_tmdb_info()['api_key']
-    subcure = Subcure(**load_collection_info())
+    subcure = Medicure(load_tmdb_info()['api_key'], **load_collection_info())
     try:
-        subcure.treat(
+        subcure.treat_subtitle(
             imdb_id,
-            file_search_pattern,
+            file_search_pattern_to_id,
             language_code,
             source,
             release_format,

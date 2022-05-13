@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import DefaultDict, Dict, List, Optional
 
 import tmdbsimple as tmdb
+import typer
 from iso639 import languages
 from pymediainfo import MediaInfo
 
@@ -17,10 +18,12 @@ class Medicure:
     The Medicure
     """
 
-    media_ext_pattern = r'\.mkv$|\.m4v$|\.mp4$|\.mka$'
+    _media_suffix_pattern = r'\.mkv$|\.m4v$|\.mp4$|\.mka$'
+    _subtitle_suffix_pattern = r'\.srt$|\.mks$|\.idx$'
 
     def __init__(
         self,
+        tmdb_api_key: str,
         movies_directory: Optional[Path] = None,
         tvshows_directory: Optional[Path] = None,
     ) -> None:
@@ -29,6 +32,9 @@ class Medicure:
 
         Parameters
         ----------
+        tmdb_api_key: str
+            Your TMDB api key
+
         movies_directory: Path, optional
             Your movies' directory, this should be given for treating a
             movie.
@@ -37,6 +43,7 @@ class Medicure:
             Your tv shows' directory, this should be given for treating
             a tv show.
         """
+        tmdb.API_KEY = tmdb_api_key
         self._movies_directory = movies_directory
         self._tvshows_directory = tvshows_directory
         self._dubbing_suppliers: Optional[List[DubbingSupplier]] = None
@@ -46,7 +53,7 @@ class Medicure:
         ] = None
         self._video_track_id: Optional[int] = None
 
-    def treat(
+    def treat_media(
         self,
         imdb_id: str,
         file_search_pattern_to_id: Dict[str, int],
@@ -106,7 +113,10 @@ class Medicure:
                 f'{title} - {release_year}'
             )
             self._scan_directory(
-                movie_directory, file_search_pattern_to_id, 'movie'
+                movie_directory,
+                file_search_pattern_to_id,
+                'movie',
+                self._media_suffix_pattern,
             )
             self._reset_tracks_info()
             for file_info in self._movie_file_infos:
@@ -146,7 +156,10 @@ class Medicure:
                 name, season_name
             )
             self._scan_directory(
-                season_directory, file_search_pattern_to_id, 'season'
+                season_directory,
+                file_search_pattern_to_id,
+                'season',
+                self._media_suffix_pattern,
             )
 
             # Create destination directory if not exists already
@@ -184,11 +197,177 @@ class Medicure:
                     )
                 )
 
+    def treat_subtitle(
+        self,
+        imdb_id: str,
+        file_search_pattern_to_id: Dict[str, int],
+        language_code: str,
+        source: Optional[str] = None,
+        release_format: Optional[str] = None,
+        include_full_information: bool = False,
+        season_number: Optional[int] = None,
+    ) -> None:
+        """
+        Fixes subtitle source, file name and language.
+
+        Parameters
+        ----------
+        imdb_id: str
+            IMDB id
+
+        file_search_pattern_to_id: dict[str, int]
+            Dict of patterns for finding files to file ids
+
+        language_code: str
+            3-letter language code for subtitle
+            See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
+            for available langauge codes.
+
+        source: str, optional
+            Source of the subtitle file: name of author or the website
+            which subtitle is downloaded from. This should be given only
+            when `include_full_information` is `True`.
+
+        release_format: str, optional
+            Format of the video that the subtitle is sync with eg:
+            Blu-ray, WEBRip, etc. See
+            https://en.wikipedia.org/wiki/Pirated_movie_release_types
+            for available formats. This should be given only
+            when `include_full_information` is `True`.
+
+        include_full_information: bool
+            If set to `True` the subtitle will be converted to mks
+            format inorder to save all subtitle information. If set to
+            `True`, `source` and `release_format`
+            should also be given.
+
+        season_number: int, optional
+            If imdb_id is a tv show season number should be given.
+        """
+        # Getting info from TMDB
+        find = tmdb.Find(imdb_id)
+        info = find.info(external_source='imdb_id')
+
+        track_config = (
+            '--language 0:{lc} '
+            '--track-name 0:"{tn}" '
+            '--sub-charset 0:WINDOWS-1256 '
+            '--default-track 0 '
+            '--forced-track 0:0 '
+        ).format(
+            lc=language_code,
+            tn=f'{source} {release_format}',
+        )
+
+        # If id is a movie
+        if info['movie_results']:
+            assert (
+                self._movies_directory is not None
+            ), 'Movies directory has been not given for a movie.'
+            movie = info['movie_results'][0]
+            title = escape_nonpath_characters(movie['title'])
+            release_year = movie['release_date'][:5]
+            movie_directory = self._movies_directory.joinpath(
+                f'{title} - {release_year}',
+            )
+            self._scan_directory(
+                movie_directory,
+                file_search_pattern_to_id,
+                'movie',
+                self._subtitle_suffix_pattern,
+            )
+            output = movie_directory.joinpath(
+                f'{title} - {release_year}.{language_code}',
+            )
+
+            if include_full_information:
+                os.system(
+                    'mkvmerge -o "{output}" {track_config}"{input}"'
+                    ''.format(
+                        output=f'{output}.mks',
+                        track_config=track_config,
+                        input=self._movie_file_infos[0].path,
+                    )
+                )
+            else:
+                for file_info in self._movie_file_infos:
+                    original_file_path = file_info.path
+                    final_file_path = '{output}{ext}'.format(
+                        output=output,
+                        ext=original_file_path.suffix,
+                    )
+                    original_file_path.rename(final_file_path)
+                    typer.echo(
+                        f'The file: {original_file_path} '
+                        f'renamed to: {final_file_path}',
+                    )
+
+        # If id is a tv show
+        elif info['tv_results']:
+            assert (
+                self._tvshows_directory is not None
+            ), 'tv shows directory has been not given for a tv show.'
+            assert (
+                season_number is not None
+            ), '`season_number` has not been given for a tv show.'
+
+            tvshow = info['tv_results'][0]
+            name = escape_nonpath_characters(tvshow['name'])
+            tmdb_id = tvshow['id']
+            season = tmdb.TV_Seasons(tmdb_id, season_number).info()
+            season_name = escape_nonpath_characters(season['name'])
+
+            season_directory = self._tvshows_directory.joinpath(
+                name, season_name
+            )
+            self._scan_directory(
+                season_directory,
+                file_search_pattern_to_id,
+                'season',
+                self._subtitle_suffix_pattern,
+            )
+
+            for episode in season['episodes']:
+                ename = escape_nonpath_characters(episode['name'])
+                enumber = episode['episode_number']
+
+                # If episode file exists
+                if enumber not in self._season_file_infos:
+                    continue
+
+                output = season_directory.joinpath(
+                    f'{name} - S{season_number:02d}E{enumber:02d} - {ename}'
+                    f'.{language_code}',
+                )
+
+                if include_full_information:
+                    os.system(
+                        'mkvmerge -o "{output}" {track_config}"{input}"'
+                        ''.format(
+                            output=f'{output}.mks',
+                            track_config=track_config,
+                            input=self._season_file_infos[enumber][0],
+                        )
+                    )
+                else:
+                    for file_info in self._season_file_infos[enumber]:
+                        original_file_path = file_info.path
+                        final_file_path = '{output}{ext}'.format(
+                            output=output,
+                            ext=original_file_path.suffix,
+                        )
+                        original_file_path.rename(final_file_path)
+                        typer.echo(
+                            f'The file: {original_file_path} '
+                            f'renamed to: {final_file_path}',
+                        )
+
     def _scan_directory(
         self,
         directory: Path,
         file_search_pattern_to_id: Dict[str, int],
         directory_type: str,
+        file_suffix_pattern: str,
     ) -> None:
         setattr(
             self,
@@ -197,7 +376,7 @@ class Medicure:
         )
 
         for file_name in directory.iterdir():
-            if re.search(self.media_ext_pattern, file_name.suffix) is None:
+            if re.search(file_suffix_pattern, file_name.suffix) is None:
                 continue
 
             file_infos = getattr(self, f'_{directory_type}_file_infos')
