@@ -1,7 +1,7 @@
 import os
 import re
 from collections import defaultdict
-from os import path
+from pathlib import Path
 from typing import DefaultDict, Dict, List, Optional
 
 import tmdbsimple as tmdb
@@ -21,19 +21,19 @@ class Medicure:
 
     def __init__(
         self,
-        movies_directory: Optional[str] = None,
-        tvshows_directory: Optional[str] = None,
+        movies_directory: Optional[Path] = None,
+        tvshows_directory: Optional[Path] = None,
     ) -> None:
         """
         Initializes Medicure.
 
         Parameters
         ----------
-        movies_directory: str, optional
+        movies_directory: Path, optional
             Your movies' directory, this should be given for treating a
             movie.
 
-        tvshows_directory: str, optional
+        tvshows_directory: Path, optional
             Your tv shows' directory, this should be given for treating
             a tv show.
         """
@@ -102,9 +102,8 @@ class Medicure:
             movie = info['movie_results'][0]
             title = escape_nonpath_characters(movie['title'])
             release_year = movie['release_date'][:5]
-            movie_directory = path.join(
-                self._movies_directory,
-                f'{title} - {release_year}',
+            movie_directory = self._movies_directory.joinpath(
+                f'{title} - {release_year}'
             )
             self._scan_directory(
                 movie_directory, file_search_pattern_to_id, 'movie'
@@ -116,8 +115,8 @@ class Medicure:
             os.system(
                 'mkvmerge -o "{output}" {track_config}'
                 ''.format(
-                    output=path.join(
-                        movie_directory, f'{title} - {release_year}.mkv'
+                    output=movie_directory.joinpath(
+                        f'{title} - {release_year}.mkv'
                     ),
                     track_config=self._get_track_config(
                         'movie',
@@ -135,7 +134,7 @@ class Medicure:
             ), 'tv shows directory has been not given for a tv show.'
             assert (
                 season_number is not None
-            ), '`season_number` can not be None for a tv show.'
+            ), '`season_number` has not been given for a tv show.'
 
             tvshow = info['tv_results'][0]
             name = escape_nonpath_characters(tvshow['name'])
@@ -143,17 +142,17 @@ class Medicure:
             season = tmdb.TV_Seasons(tmdb_id, season_number).info()
             season_name = escape_nonpath_characters(season['name'])
 
-            season_directory = path.join(
-                self._tvshows_directory, name, season_name
+            season_directory = self._tvshows_directory.joinpath(
+                name, season_name
             )
             self._scan_directory(
                 season_directory, file_search_pattern_to_id, 'season'
             )
 
             # Create destination directory if not exists already
-            destination_directory = '%s Edited' % season_directory
-            if not os.path.exists(destination_directory):
-                os.mkdir(destination_directory)
+            destination_directory = Path(f'{str(season_directory)} Edited')
+            if not destination_directory.exists():
+                destination_directory.mkdir()
 
             for episode in season['episodes']:
                 self._reset_tracks_info()
@@ -170,8 +169,7 @@ class Medicure:
                 os.system(
                     'mkvmerge -o "{output}" {track_config}'
                     ''.format(
-                        output=path.join(
-                            destination_directory,
+                        output=destination_directory.joinpath(
                             f'{name} '
                             f'- S{season_number:02d}E{enumber:02d} '
                             f'- {ename}.mkv',
@@ -188,7 +186,7 @@ class Medicure:
 
     def _scan_directory(
         self,
-        directory: str,
+        directory: Path,
         file_search_pattern_to_id: Dict[str, int],
         directory_type: str,
     ) -> None:
@@ -197,8 +195,9 @@ class Medicure:
             f'_{directory_type}_file_infos',
             list() if directory_type == 'movie' else defaultdict(list),
         )
-        for file_name in os.listdir(directory):
-            if re.search(self.media_ext_pattern, file_name) is None:
+
+        for file_name in directory.iterdir():
+            if re.search(self.media_ext_pattern, file_name.suffix) is None:
                 continue
 
             file_infos = getattr(self, f'_{directory_type}_file_infos')
@@ -206,12 +205,12 @@ class Medicure:
                 file_infos = file_infos[extract_episode_number(file_name)]
 
             for pattern in file_search_pattern_to_id:
-                if re.search(pattern, file_name) is None:
+                if re.search(pattern, str(file_name)) is None:
                     continue
 
                 file_infos.append(
                     FileInfo(
-                        path=path.join(directory, file_name),
+                        path=directory / file_name,
                         id=file_search_pattern_to_id[pattern],
                     ),
                 )

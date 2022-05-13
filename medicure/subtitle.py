@@ -1,6 +1,6 @@
 import os
 import re
-from os import path
+from pathlib import Path
 from typing import Dict, Optional
 
 import tmdbsimple as tmdb
@@ -18,26 +18,26 @@ class Subcure:
 
     def __init__(
         self,
-        movies_directory: Optional[str] = None,
-        tvshows_directory: Optional[str] = None,
+        movies_directory: Optional[Path] = None,
+        tvshows_directory: Optional[Path] = None,
     ) -> None:
         """
         Initialize Subtitle
 
         Parameters
         ----------
-        movies_directory: str, optional
+        movies_directory: Path, optional
             Your movies' directory, this should be given for treating a
             movie subtitle.
 
-        tvshows_directory: str, optional
+        tvshows_directory: Path, optional
             Your tv shows' directory, this should be given for treating
             a tv show subtitle.
         """
         self._movies_directory = movies_directory
         self._tvshows_directory = tvshows_directory
-        self._movie_file: Optional[str] = None
-        self._season_files: Optional[Dict[int, str]] = None
+        self._movie_file: Optional[Path] = None
+        self._season_files: Optional[Dict[int, Path]] = None
 
     def treat(
         self,
@@ -80,7 +80,7 @@ class Subcure:
         include_full_information: bool
             If set to `True` the subtitle will be converted to mks
             format inorder to save all subtitle information. If set to
-            `True`, `subtitle_source` and `subtitle_release_format`
+            `True`, `source` and `release_format`
             should also be given.
 
         season_number: int, optional
@@ -109,13 +109,11 @@ class Subcure:
             movie = info['movie_results'][0]
             title = escape_nonpath_characters(movie['title'])
             release_year = movie['release_date'][:5]
-            movie_directory = path.join(
-                self._movies_directory,
+            movie_directory = self._movies_directory.joinpath(
                 f'{title} - {release_year}',
             )
             self._scan_directory(movie_directory, file_search_pattern, 'movie')
-            output = path.join(
-                movie_directory,
+            output = movie_directory.joinpath(
                 f'{title} - {release_year}.{language_code}',
             )
 
@@ -132,11 +130,9 @@ class Subcure:
                 original_file_path = self._movie_file
                 final_file_path = '{output}{ext}'.format(
                     output=output,
-                    ext=re.search(
-                        self.subtitle_ext_pattern, self._movie_file
-                    ).group(),
+                    ext=original_file_path.suffix,
                 )
-                os.rename(original_file_path, final_file_path)
+                original_file_path.rename(final_file_path)
                 typer.echo(
                     f'The file: {original_file_path} '
                     f'renamed to: {final_file_path}',
@@ -149,7 +145,7 @@ class Subcure:
             ), 'tv shows directory has been not given for a tv show.'
             assert (
                 season_number is not None
-            ), '`season_number` can not be None for a tv show.'
+            ), '`season_number` has not been given for a tv show.'
 
             tvshow = info['tv_results'][0]
             name = escape_nonpath_characters(tvshow['name'])
@@ -157,8 +153,8 @@ class Subcure:
             season = tmdb.TV_Seasons(tmdb_id, season_number).info()
             season_name = escape_nonpath_characters(season['name'])
 
-            season_directory = path.join(
-                self._tvshows_directory, name, season_name
+            season_directory = self._tvshows_directory.joinpath(
+                name, season_name
             )
             self._scan_directory(
                 season_directory, file_search_pattern, 'season'
@@ -172,8 +168,7 @@ class Subcure:
                 if enumber not in self._season_files:
                     continue
 
-                output = path.join(
-                    season_directory,
+                output = season_directory.joinpath(
                     f'{name} - S{season_number:02d}E{enumber:02d} - {ename}'
                     f'.{language_code}',
                 )
@@ -191,28 +186,28 @@ class Subcure:
                     original_file_path = self._season_files[enumber]
                     final_file_path = '{output}{ext}'.format(
                         output=output,
-                        ext=re.search(
-                            self.subtitle_ext_pattern,
-                            self._season_files[enumber],
-                        ).group(),
+                        ext=original_file_path.suffix,
                     )
-                    os.rename(original_file_path, final_file_path)
+                    original_file_path.rename(final_file_path)
                     typer.echo(
                         f'The file: {original_file_path} '
                         f'renamed to: {final_file_path}',
                     )
 
     def _scan_directory(
-        self, directory: str, file_pattern: str, directory_type: str
+        self,
+        directory: Path,
+        file_pattern: str,
+        directory_type: str,
     ) -> None:
-        for file_name in os.listdir(directory):
+        for file_name in directory.iterdir():
             if (
-                re.search(self.subtitle_ext_pattern, file_name) is None
-                or re.search(file_pattern, file_name) is None
+                re.search(self.subtitle_ext_pattern, file_name.suffix) is None
+                or re.search(file_pattern, str(file_name)) is None
             ):
                 continue
 
-            file_path = path.join(directory, file_name)
+            file_path = directory / file_name
             if directory_type == 'movie':
                 self._movie_file = file_path
                 break

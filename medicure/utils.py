@@ -1,12 +1,13 @@
 import re
+from pathlib import Path
 
 
-def extract_episode_number(file_name: str) -> int:
+def extract_episode_number(file_name: Path) -> int:
     """
     Extracts episode number from file name
     """
     for pattern in (r'(?<=[xXeE])\d{2}', r'\d{1,2}'):
-        match = re.search(pattern, file_name)
+        match = re.search(pattern, str(file_name))
         if match is not None:
             episode_number = int(match.group())
             return episode_number

@@ -12,3 +12,7 @@ __pycache__
 
 # Compilde python files
 *.pyc
+
+# Package building files
+build
+*.egg-info

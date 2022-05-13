@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Optional
 
 
@@ -65,11 +66,11 @@ class FileInfo:
 
     Attributes
     ----------
-    path: str
+    path: Path
         The file path
     id: int
         The file id
     """
 
-    path: str
+    path: Path
     id: int
