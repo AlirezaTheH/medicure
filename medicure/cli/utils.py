@@ -76,13 +76,17 @@ def collection_info_from_json(json_object: Dict[str, str]) -> Dict[str, Path]:
     return {k: Path(v) for k, v in json_object.items()}
 
 
-def create_param_help(*lines: str, internal: bool = False) -> str:
+def create_param_help(
+    *lines: str, internal: bool = False, option: bool = False
+) -> str:
     """
     Creates a beautiful help message for typer parameter.
     """
     message = '\b\n\b\n{}\n'.format('\n'.join(lines))
     if internal:
-        return message[2:]
+        message = message[2:]
+    if option:
+        message = f'{message}\b\n'
     return message
 
 

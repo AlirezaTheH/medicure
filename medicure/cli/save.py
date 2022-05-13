@@ -36,29 +36,35 @@ def save_tmdb_info(
 @save_app.command('collection-info')
 def save_collection_info(
     movies_directory: Optional[Path] = typer.Option(
-        default=None,
+        None,
+        '-md',
+        '--movies-directory',
         exists=True,
         file_okay=False,
         dir_okay=True,
         writable=True,
         allow_dash=True,
         help=create_param_help(
-            ': Path',
             'Directory of your movies, must be given if',
             '`--tvshows-directory` has been not given.',
+            internal=True,
+            option=True,
         ),
     ),
     tvshows_directory: Optional[Path] = typer.Option(
-        default=None,
+        None,
+        '-td',
+        '--tvshows-directory',
         exists=True,
         file_okay=False,
         dir_okay=True,
         writable=True,
         allow_dash=True,
         help=create_param_help(
-            ': Path',
             'Directory of your tv shows, must be given if',
             '`--movies-directory` has been not given.',
+            internal=True,
+            option=True,
         ),
     ),
 ) -> None:

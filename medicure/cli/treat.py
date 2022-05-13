@@ -169,15 +169,19 @@ def treat_subtitle(
             'Blu-ray, WEBRip, ...',
             'See https://en.wikipedia.org/wiki/Pirated_movie_release_types',
             'for available formats. This should be given only',
-            'when `--include_full_information` flag is set.',
+            'when `--include-full-information` flag is set.',
         ),
     ),
     include_full_information: bool = typer.Option(
         False,
+        '-ifi',
+        '--include-full-information',
         help=create_param_help(
-            'If this flag is set the subtitle will be converted to mks',
+            'If this flag is set, the subtitle will be converted to mks',
             'format inorder to save all subtitle information. If set,',
             '`SOURCE` and `RELEASE_FORMAT` should also be given.',
+            internal=True,
+            option=True,
         ),
     ),
     season_number: Optional[int] = typer.Argument(
