@@ -6,7 +6,8 @@ import typer
 from medicure.cli.base import app
 from medicure.cli.types import DataList, Json
 from medicure.cli.utils import (
-    create_help,
+    create_param_help,
+    create_sub_param_help,
     load_collection_info,
     load_tmdb_info,
 )
@@ -20,18 +21,21 @@ app.add_typer(treat_app, name='treat')
 
 @treat_app.command('media')
 def treat_media(
-    imdb_id: str = typer.Argument(..., help=create_help(': str', 'IMDB id')),
+    imdb_id: str = typer.Argument(
+        ..., help=create_param_help(': str', 'IMDB id')
+    ),
     file_search_pattern_to_id: Dict[str, int] = typer.Argument(
         ...,
         param_type=Json,
-        help=create_help(
+        help=create_param_help(
             ': dict[str, int]',
             'Dict of patterns for finding files to file ids',
+            'You can pass a json like string for this argument.',
         ),
     ),
     video_language_code: str = typer.Argument(
         ...,
-        help=create_help(
+        help=create_param_help(
             ': str',
             '3-letter language code for video track',
             'See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes',
@@ -40,7 +44,7 @@ def treat_media(
     ),
     video_source: str = typer.Argument(
         ...,
-        help=create_help(
+        help=create_param_help(
             ': str',
             'Source of the video file; name of encoder or the website',
             'which video is downloaded from',
@@ -48,7 +52,7 @@ def treat_media(
     ),
     video_release_format: str = typer.Argument(
         ...,
-        help=create_help(
+        help=create_param_help(
             ': str',
             'Format of the video file eg: Blu-ray, WEBRip, ...',
             'See https://en.wikipedia.org/wiki/Pirated_movie_release_types',
@@ -58,16 +62,52 @@ def treat_media(
     dubbing_suppliers: List[DubbingSupplier] = typer.Argument(
         ...,
         param_type=DataList(DubbingSupplier),
-        help=create_help(
+        help=create_param_help(
             ': list[DubbingSupplier]',
             'List of possible dubbing suppliers ',
-            'each dubbing supplier has following arguments:',
-            'hello',
+            '`DubbingSupplier` is a dataclass which has the following',
+            'attributes:',
+            create_sub_param_help(
+                'name: str',
+                'Name of dubbing supplier, if dubbing supplier represents',
+                'original audio of movie or tv show should be set to its',
+                'language.',
+            ),
+            create_sub_param_help(
+                'audio_language_code: str',
+                'Current 3-letter language code for audio track',
+            ),
+            create_sub_param_help(
+                'subtitle_language_code: str',
+                'Current 3-letter language code for subtitle track',
+            ),
+            create_sub_param_help(
+                'correct_language_code: str',
+                'Correct 3-letter language code for dubbing supplier',
+            ),
+            create_sub_param_help(
+                'audio_search_pattern: str, optional',
+                'The search pattern for finding audio track',
+            ),
+            create_sub_param_help(
+                'subtitle_search_pattern: str, optional',
+                'The search pattern for finding subtitle track',
+            ),
+            create_sub_param_help(
+                'file_id: str',
+                'The file id which include dubbing supplier tracks',
+            ),
+            create_param_help(
+                'You can pass a json like string containing either',
+                'list of value lists or list of dict of keyword arguments',
+                'for this argument.',
+                internal=True,
+            ),
         ),
     ),
     season_number: Optional[int] = typer.Argument(
         None,
-        help=create_help(
+        help=create_param_help(
             ': int',
             'If `IMDB_ID` is a tv show, season number should be given.',
         ),
@@ -97,13 +137,15 @@ def treat_media(
 
 @treat_app.command('subtitle')
 def treat_subtitle(
-    imdb_id: str = typer.Argument(..., help=create_help(': str', 'IMDB id')),
+    imdb_id: str = typer.Argument(
+        ..., help=create_param_help(': str', 'IMDB id')
+    ),
     file_search_pattern: str = typer.Argument(
-        ..., help=create_help(': str', 'Pattern for finding files')
+        ..., help=create_param_help(': str', 'Pattern for finding files')
     ),
     language_code: str = typer.Argument(
         ...,
-        help=create_help(
+        help=create_param_help(
             ': str',
             '3-letter language code for subtitle',
             'See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes',
@@ -112,7 +154,7 @@ def treat_subtitle(
     ),
     source: Optional[str] = typer.Argument(
         None,
-        help=create_help(
+        help=create_param_help(
             ': str',
             'Source of the subtitle file: name of author or the website',
             'which subtitle is downloaded from. This should be given only',
@@ -121,7 +163,7 @@ def treat_subtitle(
     ),
     release_format: Optional[str] = typer.Argument(
         None,
-        help=create_help(
+        help=create_param_help(
             ': str',
             'Format of the video that the subtitle is sync with eg:',
             'Blu-ray, WEBRip, ...',
@@ -132,7 +174,7 @@ def treat_subtitle(
     ),
     include_full_information: bool = typer.Option(
         False,
-        help=create_help(
+        help=create_param_help(
             'If this flag is set the subtitle will be converted to mks',
             'format inorder to save all subtitle information. If set,',
             '`SOURCE` and `RELEASE_FORMAT` should also be given.',
@@ -140,7 +182,7 @@ def treat_subtitle(
     ),
     season_number: Optional[int] = typer.Argument(
         None,
-        help=create_help(
+        help=create_param_help(
             ': int',
             'If `IMDB_ID` is a tv show, season number should be given.',
         ),

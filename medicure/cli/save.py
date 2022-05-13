@@ -5,7 +5,7 @@ from typing import Optional
 import typer
 
 from medicure.cli.base import app
-from medicure.cli.utils import create_help, get_base_path
+from medicure.cli.utils import create_param_help, get_base_path
 
 save_app = typer.Typer()
 app.add_typer(save_app, name='save')
@@ -14,7 +14,7 @@ app.add_typer(save_app, name='save')
 @save_app.command('tmdb-info')
 def save_tmdb_info(
     api_key: str = typer.Argument(
-        ..., help=create_help(': str', 'The TMDB api key')
+        ..., help=create_param_help(': str', 'The TMDB api key')
     ),
 ) -> None:
     """
@@ -42,7 +42,7 @@ def save_collection_info(
         dir_okay=True,
         writable=True,
         allow_dash=True,
-        help=create_help(
+        help=create_param_help(
             ': Path',
             'Directory of your movies, must be given if',
             '`--tvshows-directory` has been not given.',
@@ -55,7 +55,7 @@ def save_collection_info(
         dir_okay=True,
         writable=True,
         allow_dash=True,
-        help=create_help(
+        help=create_param_help(
             ': Path',
             'Directory of your tv shows, must be given if',
             '`--movies-directory` has been not given.',
