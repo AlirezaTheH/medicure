@@ -33,7 +33,7 @@ class Medicure:
         Parameters
         ----------
         tmdb_api_key: str
-            Your TMDB api key
+            Your TMDB API key
 
         movies_directory: Path, optional
             Your movies' directory, this should be given for treating a

@@ -14,7 +14,7 @@ app.add_typer(save_app, name='save')
 @save_app.command('tmdb-info')
 def save_tmdb_info(
     api_key: str = typer.Argument(
-        ..., help=create_param_help(': str', 'The TMDB api key')
+        ..., help=create_param_help(': str', 'The TMDB API key')
     ),
 ) -> None:
     """
