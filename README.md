@@ -139,7 +139,7 @@ medicure save collection-info \
 Now we can run:
 ```bash
 medicure treat media \
-    'tt2442560' \
+    tt2442560 \
     '{"PSA": 0}' \
     eng \
     PSA \
