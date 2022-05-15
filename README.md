@@ -18,7 +18,11 @@ which means "care".
   tools
 
 ## Installation
-Currently, Medicure can be installed only through GitHub:
+The easiest way to install is from PyPI:
+```bash
+pip install medicure
+```
+Alternatively, you can install directly from GitHub:
 ```bash
 pip install git+https://github.com/alirezatheh/medicure.git
 ```

@@ -1,5 +1,5 @@
 tmdbsimple
 pymediainfo
 iso-639
-click==8.0.4
-typer@git+https://github.com/dwreeves/typer.git
+click
+typer
