@@ -40,6 +40,7 @@ def patch_param_type() -> None:
                     if patch['after'] in line:
                         line_indent = line[: line.index(patch['after'])]
                         module_source += f'{line_indent}{patch["insert"]}\n'
+                        break
 
         with open(module_source_path, 'w') as f:
             f.write(module_source)
