@@ -1,3 +1,6 @@
+[![PyPI Version](https://img.shields.io/pypi/v/medicure)](https://pypi.python.org/pypi/medicure)
+[![Python Versions](https://img.shields.io/pypi/pyversions/medicure)](https://pypi.org/project/medicure)
+
 # Medicure
 Medicure is a cosmetic treatment for your media files: movies, tv shows
 and also their subtitles. Medicure provides a command-line tool and also
