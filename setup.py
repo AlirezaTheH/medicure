@@ -50,7 +50,7 @@ setup(
         'keyword',
     ],
     install_requires=requirements,
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     classifiers=[
         'Topic :: Multimedia :: Video',
         'Topic :: Multimedia :: Sound/Audio',
