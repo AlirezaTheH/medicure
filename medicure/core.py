@@ -18,8 +18,8 @@ class Medicure:
     The Medicure
     """
 
-    _media_suffix_pattern = r'\.mkv$|\.m4v$|\.mp4$|\.mka$'
-    _subtitle_suffix_pattern = r'\.srt$|\.mks$|\.idx$'
+    _media_suffix_pattern = r'\.(mkv|m4v|mp4|mka)$'
+    _subtitle_suffix_pattern = r'\.(srt|mks|idx|sub)$'
 
     def __init__(
         self,
