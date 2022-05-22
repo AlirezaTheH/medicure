@@ -1,5 +1,6 @@
 ## Latest Changes
 ### New
+- Add CODE_OF_CONDUCT.md
 - Add CHANGELOG.md
 - Add PyPi labels to README.md
 
