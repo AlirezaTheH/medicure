@@ -1,0 +1,52 @@
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      new-version:
+        description: New version to be published
+        required: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10
+
+      - name: Upgrade pip
+        run: python3 -m pip install --upgrade pip
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: python3 -m pip install -r ./requirements/main.txt
+
+      - name: Bump versions
+        uses: alirezatheh/auto-bump-versions@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          new-version: ${{ github.event.inputs.new-version }}
+          use-bumpver: true
+
+      - name: PyPI publish
+        uses: alirezatheh/pypi-auto-publish@v1
+        with:
+          test-api-pypi-token: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          pypi-api-token: ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: GitHub publish
+        uses: alirezatheh/github-auto-publish@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
