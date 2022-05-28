@@ -1,24 +1,45 @@
-## Latest Changes
-### New
-- Add CODE_OF_CONDUCT.md
-- Add CHANGELOG.md
-- Add PyPi labels to README.md
+# Changelog
+All notable changes to this project will be documented in this file.
 
-### Improvements
-- Improve media and subtitle patterns
-- Improve typer patch speed
+The format is based on
+[Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
+adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Fixes
+
+## [Unreleased]
+### Added
+- Added [BumpVer](https://github.com/mbarkhau/bumpver) config
+- Add extras requirements
+- Added `CODE_OF_CONDUCT.md`
+- Added `CHANGELOG.md`
+- Added PyPI labels to `README.md`
+
+### Changed
+- Reformatted `CHANGELOG.md` to
+  [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format
+- Improved media and subtitle patterns
+- Improved typer patch speed
+
+### Fixed
+- Add `MANIFEST.in` to include extras requirements in source builds
+- Remove unnecessary exclusion from `pre-commit` excludes
 - Set minimum Python version to `3.8`
 
 
-## v0.0.4
-### Improvements
-- Remove direct dependencies
-- Add Medicure to PyPi
+## [0.0.4] - 2022-05-13
+### Added
+- Added Medicure to PyPI
+
+### Fixed
+- Removed direct dependencies
 
 
-## v0.0.3
-### Improvements
-- First version of Python package added
+## [0.0.3] - 2022-05-14
+### Added
+- Added First version of Python package added
 - First version of CLI added
+
+
+[Unreleased]: https://github.com/alirezatheh/medicure/compare/v0.0.4...HEAD
+[0.0.4]: https://github.com/alirezatheh/medicure/compare/v0.0.3...v0.0.4
+[0.0.3]: https://github.com/alirezatheh/medicure/releases/tag/v0.0.3
