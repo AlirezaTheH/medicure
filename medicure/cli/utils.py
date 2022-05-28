@@ -57,7 +57,7 @@ def load_collection_info() -> Dict[str, Path]:
     if not info_path.exists():
         typer.secho('Error: No collection info found.', err=True, fg='red')
         typer.secho(
-            'You need to save your collection info '
+            'Hint: You need to save your collection info '
             'with `medicure save collection-info` command.',
             fg='blue',
         )
