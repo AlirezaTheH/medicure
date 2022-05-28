@@ -1,19 +1,27 @@
 import re
-from os.path import join
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
 packages = find_packages(exclude=['tests*'])
 
-with open('requirements.txt') as f:
+requirements_path = Path('requirements')
+with open(requirements_path / 'main.txt') as f:
     requirements = f.read().split()
+
+extras_requirements = {}
+for extra in requirements_path.iterdir():
+    if not extra.name.endswith('main.txt'):
+        with open(extra) as f:
+            extras_requirements[extra.name[:-4]] = f.read().split()
 
 with open('README.md') as f:
     long_description = f.read()
 
-with open(join('medicure', 'version.py')) as f:
-    version_pattern = re.compile(r'__version__\s+=\s+\'(?P<version>.*)\'')
-    version = re.search(version_pattern, f.read()).group('version')
+with open(Path('medicure') / 'version.py') as f:
+    version = re.search(
+        r'__version__\s+=\s+\'(?P<version>.*)\'', f.read()
+    ).group('version')
 
 setup(
     name='medicure',
@@ -35,21 +43,23 @@ setup(
     packages=packages,
     entry_points={'console_scripts': ['medicure = medicure.cli:app']},
     keywords=[
-        'nlp',
-        'natural language processing',
-        'information retrieval',
-        'computational linguistics',
-        'persian language',
-        'persian nlp',
-        'persian',
-        'keyphrase extraction',
-        'keyphrase extractor',
-        'keyphrase',
-        'keyword extraction',
-        'keyword extractor',
-        'keyword',
+        'audio',
+        'video',
+        'videos',
+        'media',
+        'multimedia',
+        'movies',
+        'tv',
+        'tvshows',
+        'tv-shows',
+        'series',
+        'subtitle',
+        'subtitles',
+        'audio-processing',
+        'video-processing',
     ],
     install_requires=requirements,
+    extras_require=extras_requirements,
     python_requires='>=3.8',
     classifiers=[
         'Topic :: Multimedia :: Video',
