@@ -1,0 +1,11 @@
+[bumpver]
+current_version = '0.0.4'
+version_pattern = 'MAJOR.MINOR.PATCH'
+
+[bumpver.file_patterns]
+'medicure/version.py' = [
+    "__version__ = '{version}'",
+]
+'bumpver.toml' = [
+    "current_version = '{version}'",
+]
