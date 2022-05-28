@@ -63,5 +63,4 @@ repos:
           (?x)(
               __init__|
               tests|
-              main
           )
