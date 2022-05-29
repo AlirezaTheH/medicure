@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
 ## [Unreleased]
+### Added
+- Medicure now keeps actions up to date with Dependabot
 
 ## [0.1.5] - 2022-05-28
 ### Added
