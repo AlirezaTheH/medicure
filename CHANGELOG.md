@@ -11,6 +11,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added pre-commit ci for auto updating pre-commit hooks
 - Medicure now keeps actions up to date with Dependabot
 
+### Changed
+- Treated movies and subtitles are now being created in a different directory
+  from the original files.
+
 ## [0.1.5] - 2022-05-28
 ### Added
 - Added [BumpVer](https://github.com/mbarkhau/bumpver) config

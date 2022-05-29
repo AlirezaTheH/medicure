@@ -122,10 +122,13 @@ class Medicure:
             for file_info in self._movie_file_infos:
                 self._save_file_tracks_info(file_info)
 
+            destination_directory = self._get_destination_directory(
+                movie_directory
+            )
             os.system(
                 'mkvmerge -o "{output}" {track_config}'
                 ''.format(
-                    output=movie_directory.joinpath(
+                    output=destination_directory.joinpath(
                         f'{title} - {release_year}.mkv'
                     ),
                     track_config=self._get_track_config(
@@ -162,10 +165,9 @@ class Medicure:
                 self._media_suffix_pattern,
             )
 
-            # Create destination directory if not exists already
-            destination_directory = Path(f'{str(season_directory)} Edited')
-            if not destination_directory.exists():
-                destination_directory.mkdir()
+            destination_directory = self._get_destination_directory(
+                season_directory
+            )
 
             for episode in season['episodes']:
                 self._reset_tracks_info()
@@ -276,7 +278,10 @@ class Medicure:
                 'movie',
                 self._subtitle_suffix_pattern,
             )
-            output = movie_directory.joinpath(
+            destination_directory = self._get_destination_directory(
+                movie_directory
+            )
+            output = destination_directory.joinpath(
                 f'{title} - {release_year}.{language_code}',
             )
 
@@ -326,6 +331,9 @@ class Medicure:
                 'season',
                 self._subtitle_suffix_pattern,
             )
+            destination_directory = self._get_destination_directory(
+                season_directory
+            )
 
             for episode in season['episodes']:
                 ename = escape_nonpath_characters(episode['name'])
@@ -335,7 +343,7 @@ class Medicure:
                 if enumber not in self._season_file_infos:
                     continue
 
-                output = season_directory.joinpath(
+                output = destination_directory.joinpath(
                     f'{name} - S{season_number:02d}E{enumber:02d} - {ename}'
                     f'.{language_code}',
                 )
@@ -547,6 +555,14 @@ class Medicure:
         return '--{df} {tid}:{flag} '.format(
             df=df, tid=getattr(ds, f'_{sa}_track_id'), flag=flag
         )
+
+    @staticmethod
+    def _get_destination_directory(directory: Path) -> Path:
+        destination_directory = Path(f'{str(directory)} Edited')
+        if not destination_directory.exists():
+            destination_directory.mkdir()
+
+        return destination_directory
 
     @staticmethod
     def _make_language_code(ds: DubbingSupplier, sa: str) -> str:
