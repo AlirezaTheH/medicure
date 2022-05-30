@@ -18,7 +18,7 @@ class Medicure:
     The Medicure
     """
 
-    _media_suffix_pattern = r'\.(mkv|m4v|mp4|mka)$'
+    _media_suffix_pattern = r'\.(mkv|m4v|mp4|mka|mp3)$'
     _subtitle_suffix_pattern = r'\.(srt|mks|idx|sub)$'
 
     def __init__(
@@ -116,7 +116,8 @@ class Medicure:
                 movie_directory,
                 file_search_pattern_to_id,
                 'movie',
-                self._media_suffix_pattern,
+                rf'({self._media_suffix_pattern})'
+                rf'|({self._subtitle_suffix_pattern})',
             )
             self._reset_tracks_info()
             for file_info in self._movie_file_infos:
@@ -162,7 +163,8 @@ class Medicure:
                 season_directory,
                 file_search_pattern_to_id,
                 'season',
-                self._media_suffix_pattern,
+                rf'({self._media_suffix_pattern})'
+                rf'|({self._subtitle_suffix_pattern})',
             )
 
             destination_directory = self._get_destination_directory(
@@ -277,6 +279,7 @@ class Medicure:
                 file_search_pattern_to_id,
                 'movie',
                 self._subtitle_suffix_pattern,
+                include_full_information,
             )
             destination_directory = self._get_destination_directory(
                 movie_directory
@@ -330,6 +333,7 @@ class Medicure:
                 file_search_pattern_to_id,
                 'season',
                 self._subtitle_suffix_pattern,
+                include_full_information,
             )
             destination_directory = self._get_destination_directory(
                 season_directory
@@ -376,6 +380,7 @@ class Medicure:
         file_search_pattern_to_id: Dict[str, int],
         directory_type: str,
         file_suffix_pattern: str,
+        include_full_information: bool = True,
     ) -> None:
         setattr(
             self,
@@ -386,6 +391,10 @@ class Medicure:
         for file_name in directory.iterdir():
             if re.search(file_suffix_pattern, file_name.suffix) is None:
                 continue
+
+            assert (
+                not include_full_information or file_name.suffix != '.sub'
+            ), '.sub files does not contain any information.'
 
             file_infos = getattr(self, f'_{directory_type}_file_infos')
             if directory_type == 'season':
