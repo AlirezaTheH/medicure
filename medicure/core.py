@@ -108,7 +108,7 @@ class Medicure:
             ), 'Movies directory has been not given for a movie.'
             movie = info['movie_results'][0]
             title = escape_nonpath_characters(movie['title'])
-            release_year = movie['release_date'][:5]
+            release_year = movie['release_date'][:4]
             movie_directory = self._movies_directory.joinpath(
                 f'{title} - {release_year}'
             )
@@ -270,7 +270,7 @@ class Medicure:
             ), 'Movies directory has been not given for a movie.'
             movie = info['movie_results'][0]
             title = escape_nonpath_characters(movie['title'])
-            release_year = movie['release_date'][:5]
+            release_year = movie['release_date'][:4]
             movie_directory = self._movies_directory.joinpath(
                 f'{title} - {release_year}',
             )
