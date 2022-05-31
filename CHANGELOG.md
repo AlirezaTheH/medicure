@@ -16,6 +16,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Treated movies and subtitles are now being created in a different directory
   from the original files.
 
+### Fixed
+- Fixed a bug in extracting `track_id` from subtitle files
+
 ## [0.1.5] - 2022-05-28
 ### Added
 - Added [BumpVer](https://github.com/mbarkhau/bumpver) config

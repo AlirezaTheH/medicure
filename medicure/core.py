@@ -452,7 +452,11 @@ class Medicure:
                                 ).part2b
                             )
                         ):
-                            setattr(ds, f'_{tt}_track_id', track.track_id - 1)
+                            setattr(
+                                ds,
+                                f'_{tt}_track_id',
+                                (track.track_id or 1) - 1,
+                            )
                     continue
 
     def _reset_tracks_info(self) -> None:
