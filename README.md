@@ -66,18 +66,15 @@ from pathlib import Path
 
 from medicure import Medicure, DubbingSupplier
 
-# In this we only one dubbing supplier and that's which contains
-# original audio and subtitle.
+# In this example we only have one dubbing supplier and that's which
+# contains original audio and subtitle.
 dubbing_suppliers = [
     DubbingSupplier(
-        # For original dubbing supplier name doesn't matter.
         name='original',
+        file_id=0,
+        correct_language_code='eng',
         audio_language_code='eng',
         subtitle_language_code='eng',
-        correct_language_code='eng',
-        audio_search_pattern=None,
-        subtitle_search_pattern=None,
-        file_id=0,
     ),
 ]
 

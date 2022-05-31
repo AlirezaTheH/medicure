@@ -68,8 +68,16 @@ def treat_media(
             create_sub_param_help(
                 'name: str',
                 'Name of dubbing supplier, if dubbing supplier represents',
-                'original audio of movie or tv show should be set to its',
-                'language.',
+                "original audio of movie or tv show this doesn't matter but",
+                "should set to `'original'` for better convenience.",
+            ),
+            create_sub_param_help(
+                'file_id: str',
+                'The file id which include dubbing supplier tracks',
+            ),
+            create_sub_param_help(
+                'correct_language_code: str',
+                'Correct 3-letter language code for dubbing supplier',
             ),
             create_sub_param_help(
                 'audio_language_code: str',
@@ -80,20 +88,12 @@ def treat_media(
                 'Current 3-letter language code for subtitle track',
             ),
             create_sub_param_help(
-                'correct_language_code: str',
-                'Correct 3-letter language code for dubbing supplier',
-            ),
-            create_sub_param_help(
                 'audio_search_pattern: str, optional',
                 'The search pattern for finding audio track',
             ),
             create_sub_param_help(
                 'subtitle_search_pattern: str, optional',
                 'The search pattern for finding subtitle track',
-            ),
-            create_sub_param_help(
-                'file_id: str',
-                'The file id which include dubbing supplier tracks',
             ),
             create_param_help(
                 'You can pass a json like string containing either',

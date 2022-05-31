@@ -10,7 +10,11 @@ from iso639 import languages
 from pymediainfo import MediaInfo
 
 from medicure.data_structures import DubbingSupplier, FileInfo
-from medicure.utils import escape_nonpath_characters, extract_episode_number
+from medicure.utils import (
+    extract_episode_number,
+    get_movie_name,
+    get_tvshow_info,
+)
 
 
 class Medicure:
@@ -98,20 +102,16 @@ class Medicure:
         self._dubbing_suppliers = dubbing_suppliers
 
         # Getting info from TMDB
-        find = tmdb.Find(imdb_id)
-        info = find.info(external_source='imdb_id')
+        info = tmdb.Find(imdb_id).info(external_source='imdb_id')
 
         # If id is a movie
         if info['movie_results']:
             assert (
                 self._movies_directory is not None
             ), 'Movies directory has been not given for a movie.'
-            movie = info['movie_results'][0]
-            title = escape_nonpath_characters(movie['title'])
-            release_year = movie['release_date'][:4]
-            movie_directory = self._movies_directory.joinpath(
-                f'{title} - {release_year}'
-            )
+
+            movie_name = get_movie_name(info)
+            movie_directory = self._movies_directory / movie_name
             self._scan_directory(
                 movie_directory,
                 file_search_pattern_to_id,
@@ -129,9 +129,7 @@ class Medicure:
             os.system(
                 'mkvmerge -o "{output}" {track_config}'
                 ''.format(
-                    output=destination_directory.joinpath(
-                        f'{title} - {release_year}.mkv'
-                    ),
+                    output=destination_directory / f'{movie_name}.mkv',
                     track_config=self._get_track_config(
                         'movie',
                         video_language_code,
@@ -150,15 +148,8 @@ class Medicure:
                 season_number is not None
             ), '`season_number` has not been given for a tv show.'
 
-            tvshow = info['tv_results'][0]
-            name = escape_nonpath_characters(tvshow['name'])
-            tmdb_id = tvshow['id']
-            season = tmdb.TV_Seasons(tmdb_id, season_number).info()
-            season_name = escape_nonpath_characters(season['name'])
-
-            season_directory = self._tvshows_directory.joinpath(
-                name, season_name
-            )
+            name, season_name, season = get_tvshow_info(season_number, info)
+            season_directory = self._tvshows_directory / name / season_name
             self._scan_directory(
                 season_directory,
                 file_search_pattern_to_id,
@@ -173,7 +164,7 @@ class Medicure:
 
             for episode in season['episodes']:
                 self._reset_tracks_info()
-                ename = escape_nonpath_characters(episode['name'])
+                ename = episode['name']
                 enumber = episode['episode_number']
 
                 # If episode file does not exist
@@ -268,12 +259,9 @@ class Medicure:
             assert (
                 self._movies_directory is not None
             ), 'Movies directory has been not given for a movie.'
-            movie = info['movie_results'][0]
-            title = escape_nonpath_characters(movie['title'])
-            release_year = movie['release_date'][:4]
-            movie_directory = self._movies_directory.joinpath(
-                f'{title} - {release_year}',
-            )
+
+            movie_name = get_movie_name(info)
+            movie_directory = self._movies_directory / movie_name
             self._scan_directory(
                 movie_directory,
                 file_search_pattern_to_id,
@@ -284,9 +272,7 @@ class Medicure:
             destination_directory = self._get_destination_directory(
                 movie_directory
             )
-            output = destination_directory.joinpath(
-                f'{title} - {release_year}.{language_code}',
-            )
+            output = destination_directory / f'{movie_name}.{language_code}'
 
             if include_full_information:
                 os.system(
@@ -319,15 +305,8 @@ class Medicure:
                 season_number is not None
             ), '`season_number` has not been given for a tv show.'
 
-            tvshow = info['tv_results'][0]
-            name = escape_nonpath_characters(tvshow['name'])
-            tmdb_id = tvshow['id']
-            season = tmdb.TV_Seasons(tmdb_id, season_number).info()
-            season_name = escape_nonpath_characters(season['name'])
-
-            season_directory = self._tvshows_directory.joinpath(
-                name, season_name
-            )
+            name, season_name, season = get_tvshow_info(season_number, info)
+            season_directory = self._tvshows_directory / name / season_name
             self._scan_directory(
                 season_directory,
                 file_search_pattern_to_id,
@@ -340,7 +319,7 @@ class Medicure:
             )
 
             for episode in season['episodes']:
-                ename = escape_nonpath_characters(episode['name'])
+                ename = episode['name']
                 enumber = episode['episode_number']
 
                 # If episode file exists
@@ -571,7 +550,7 @@ class Medicure:
 
     @staticmethod
     def _get_destination_directory(directory: Path) -> Path:
-        destination_directory = Path(f'{str(directory)} Edited')
+        destination_directory = Path(f'{directory} Edited')
         if not destination_directory.exists():
             destination_directory.mkdir()
 

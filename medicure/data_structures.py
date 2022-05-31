@@ -12,21 +12,24 @@ class DubbingSupplier:
     ----------
     name: str
         Name of dubbing supplier, if dubbing supplier represents
-        original audio of movie or tv show should be set to its
-        language.
+        original audio of movie or tv show this doesn't matter but
+        should set to `'original'` for better convenience.
 
-    audio_language_code: str
+    file_id: int
+        The file id which include dubbing supplier tracks
+
+    correct_language_code: str
+        Correct 3-letter language code for dubbing supplier
+        See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
+        for available langauge codes.
+
+    audio_language_code: str, optional
         Current 3-letter language code for audio track
         See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
         for available langauge codes.
 
-    subtitle_language_code: str
+    subtitle_language_code: str, optional
         Current 3-letter language code for subtitle track
-        See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
-        for available langauge codes.
-
-    correct_language_code: str
-        Correct 3-letter language code for dubbing supplier
         See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
         for available langauge codes.
 
@@ -35,18 +38,15 @@ class DubbingSupplier:
 
     subtitle_search_pattern: str, optional
         The search pattern for finding subtitle track
-
-    file_id: int
-        The file id which include dubbing supplier tracks
     """
 
     name: str
-    audio_language_code: str
-    subtitle_language_code: str
-    correct_language_code: str
-    audio_search_pattern: Optional[str]
-    subtitle_search_pattern: Optional[str]
     file_id: int
+    correct_language_code: str
+    audio_language_code: Optional[str] = None
+    subtitle_language_code: Optional[str] = None
+    audio_search_pattern: Optional[str] = None
+    subtitle_search_pattern: Optional[str] = None
 
     _audio_track_id: int = None
     _subtitle_track_id: int = None
