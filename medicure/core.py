@@ -519,14 +519,14 @@ class Medicure:
                                 getattr(ds, f'_{tt}_track_id'),
                             )
 
-            for tt in ['audio', 'subtitle']:
+            for i, tt in enumerate(['audio', 'subtitle']):
                 if len(file_tracks_ids[tt]) > 0:
                     track_config += '--{tt}-tracks {ts} '.format(
                         tt=tt,
                         ts=','.join([str(tid) for tid in file_tracks_ids[tt]]),
                     )
                 else:
-                    track_config += f'--no-{tt} '
+                    track_config += f'--no-{tt}{"s" * i} '
 
             track_config += f'"{file_info.path}" '
 

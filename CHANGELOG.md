@@ -17,6 +17,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   from the original files.
 
 ### Fixed
+- Fixed `mkvmerge`'s `--no-subtitles` flag when dubbing supplier has no subtitle
+  tracks
 - Fixed a bug in extracting `track_id` from subtitle files
 
 ## [0.1.5] - 2022-05-28
