@@ -443,10 +443,10 @@ class Medicure:
                                     track.title,
                                 )
                                 or (
-                                    ds.audio_language_code is None
+                                    getattr(ds, f'{tt}_language_code') is None
                                     and track.language is None
                                 )
-                                or ds.audio_language_code
+                                or getattr(ds, f'{tt}_language_code')
                                 == languages.get(
                                     part1=track.language,
                                 ).part2b
