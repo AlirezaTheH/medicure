@@ -13,6 +13,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Medicure now keeps actions up to date with Dependabot
 
 ### Changed
+- Treated subtitle files when `include_full_information` is `False`, now will
+  be copied to destination directory before renaming.
 - Treated movies and subtitles are now being created in a different directory
   from the original files.
 

@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 from collections import defaultdict
 from pathlib import Path
 from typing import DefaultDict, Dict, List, Optional
@@ -290,10 +291,10 @@ class Medicure:
                         output=output,
                         ext=original_file_path.suffix,
                     )
-                    original_file_path.rename(final_file_path)
+                    shutil.copyfile(original_file_path, final_file_path)
                     typer.echo(
                         f'The file: {original_file_path} '
-                        f'renamed to: {final_file_path}',
+                        f'copied and renamed to: {final_file_path}.',
                     )
 
         # If id is a tv show
@@ -337,7 +338,7 @@ class Medicure:
                         ''.format(
                             output=f'{output}.mks',
                             track_config=track_config,
-                            input=self._season_file_infos[enumber][0],
+                            input=self._season_file_infos[enumber][0].path,
                         )
                     )
                 else:
@@ -347,10 +348,10 @@ class Medicure:
                             output=output,
                             ext=original_file_path.suffix,
                         )
-                        original_file_path.rename(final_file_path)
+                        shutil.copyfile(original_file_path, final_file_path)
                         typer.echo(
                             f'The file: {original_file_path} '
-                            f'renamed to: {final_file_path}',
+                            f'copied and renamed to : {final_file_path}.',
                         )
 
     def _scan_directory(
