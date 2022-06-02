@@ -19,6 +19,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   from the original files.
 
 ### Fixed
+- Fixed publish workflow's pip caching.
 - Fixed a bug in extracting release year for movies
 - Fixed a bug in extracting track info from subtitle files
 - Fixed `mkvmerge`'s `--no-subtitles` flag when dubbing supplier has no subtitle

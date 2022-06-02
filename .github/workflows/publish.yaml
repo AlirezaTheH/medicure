@@ -27,11 +27,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/main.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
       - name: Install dependencies
-        run: python3 -m pip install -r ./requirements/main.txt
+        run: python3 -m pip install -r requirements/main.txt
 
       - name: Bump versions
         uses: alirezatheh/auto-bump-versions@v1
