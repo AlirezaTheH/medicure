@@ -148,7 +148,7 @@ medicure treat media \
     eng \
     PSA \
     WEB-DL \
-    '[["original", "eng", "eng", "eng", null, null, 0]]' \
+    '[["original", 0, "eng", "eng", "eng"]]' \
     6
 ```
 
