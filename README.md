@@ -1,3 +1,4 @@
+[![tests](https://github.com/alirezatheh/medicure/workflows/tests/badge.svg)](https://github.com/alirezatheh/medicure/actions)
 [![PyPI Version](https://img.shields.io/pypi/v/medicure)](https://pypi.python.org/pypi/medicure)
 [![Python Versions](https://img.shields.io/pypi/pyversions/medicure)](https://pypi.org/project/medicure)
 

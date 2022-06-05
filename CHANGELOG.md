@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 ### Added
+- Added tests workflow
 - Added treat tests
 - Enabled direct subtitle injecting when treating media
 - Added pre-commit ci for auto updating pre-commit hooks
