@@ -12,10 +12,16 @@ from medicure.utils import get_movie_name, get_tvshow_info
 @pytest.mark.parametrize(
     'file_search_pattern_to_id, dubbing_suppliers, correct_tracks_info',
     [
-        # Single file
+        # Single file with a dummy dubbing supplier
         (
             {r'\.mkv': 0},
             [
+                # Dummy, won't match with any track.
+                DubbingSupplier(
+                    name='original',
+                    file_id=0,
+                    correct_language_code='eng',
+                ),
                 DubbingSupplier(
                     name='original',
                     file_id=0,
@@ -51,7 +57,7 @@ from medicure.utils import get_movie_name, get_tvshow_info
                 },
             ],
         ),
-        # An extra audio file
+        # An extra audio file with a dummy dubbing supplier
         (
             {r'\.mkv': 0, r'\.mka': 1},
             [
@@ -62,10 +68,17 @@ from medicure.utils import get_movie_name, get_tvshow_info
                     audio_language_code='eng',
                     subtitle_language_code='eng',
                 ),
+                # Dummy, won't match with any track.
                 DubbingSupplier(
                     name='TinyMoviez',
                     file_id=1,
                     correct_language_code='per',
+                ),
+                DubbingSupplier(
+                    name='TinyMoviez',
+                    file_id=1,
+                    correct_language_code='per',
+                    audio_search_pattern=r'TinyMoviez\.co',
                 ),
             ],
             [
@@ -170,6 +183,7 @@ from medicure.utils import get_movie_name, get_tvshow_info
                     name='TinyMoviez',
                     file_id=1,
                     correct_language_code='per',
+                    audio_search_pattern=r'TinyMoviez\.co',
                 ),
                 DubbingSupplier(
                     name='TinyMoviez',
@@ -261,34 +275,36 @@ def test_treat_media(
 
     # TV Show
     imdb_id = 'tt2442560'
-    season_number = 6
-    medicure.treat_media(
-        imdb_id,
-        file_search_pattern_to_id,
-        video_language_code,
-        video_source,
-        video_release_format,
-        dubbing_suppliers,
-        season_number,
-    )
-    name, season_name, season = get_tvshow_info(season_number, imdb_id=imdb_id)
-    season_directory = tvshows_directory / name / season_name
-    destination_directory = Path(f'{season_directory} Edited')
-    assert destination_directory.exists()
-
-    for episode in season['episodes']:
-        ename = episode['name']
-        enumber = episode['episode_number']
-
-        treated_episode_file_path = destination_directory.joinpath(
-            f'{name} - S{season_number:02d}E{enumber:02d} - {ename}.mkv',
+    for season_number, available_episode_count in {5: 1, 6: 6}.items():
+        medicure.treat_media(
+            imdb_id,
+            file_search_pattern_to_id,
+            video_language_code,
+            video_source,
+            video_release_format,
+            dubbing_suppliers,
+            season_number,
         )
-        assert treated_episode_file_path.exists()
+        name, season_name, season = get_tvshow_info(
+            season_number, imdb_id=imdb_id
+        )
+        season_directory = tvshows_directory / name / season_name
+        destination_directory = Path(f'{season_directory} Edited')
+        assert destination_directory.exists()
 
-        media_info = MediaInfo.parse(treated_episode_file_path)
-        for i, track in enumerate(media_info.tracks[1:]):
-            for attribute, value in correct_tracks_info[i].items():
-                assert getattr(track, attribute) == value
+        for episode in season['episodes'][:available_episode_count]:
+            ename = episode['name']
+            enumber = episode['episode_number']
+
+            treated_episode_file_path = destination_directory.joinpath(
+                f'{name} - S{season_number:02d}E{enumber:02d} - {ename}.mkv',
+            )
+            assert treated_episode_file_path.exists()
+
+            media_info = MediaInfo.parse(treated_episode_file_path)
+            for i, track in enumerate(media_info.tracks[1:]):
+                for attribute, value in correct_tracks_info[i].items():
+                    assert getattr(track, attribute) == value
 
 
 @pytest.mark.parametrize('include_full_information', [True, False])
@@ -339,33 +355,72 @@ def test_treat_subtitle(
 
     # TV Show
     imdb_id = 'tt2442560'
-    season_number = 6
-    medicure.treat_subtitle(
-        imdb_id,
-        {r'\.srt': 0},
-        language_code,
-        source,
-        release_format,
-        include_full_information,
-        season_number,
-    )
-
-    name, season_name, season = get_tvshow_info(season_number, imdb_id=imdb_id)
-    season_directory = tvshows_directory / name / season_name
-    destination_directory = Path(f'{season_directory} Edited')
-    assert destination_directory.exists()
-
-    for episode in season['episodes']:
-        ename = episode['name']
-        enumber = episode['episode_number']
-
-        treated_episode_subtitle_file_path = destination_directory.joinpath(
-            f'{name} - S{season_number:02d}E{enumber:02d} - {ename}'
-            f'.{language_code}{suffix}',
+    for season_number, available_episode_count in {5: 1, 6: 6}.items():
+        medicure.treat_subtitle(
+            imdb_id,
+            {r'\.srt': 0},
+            language_code,
+            source,
+            release_format,
+            include_full_information,
+            season_number,
         )
-        assert treated_episode_subtitle_file_path.exists()
 
-        if include_full_information:
-            media_info = MediaInfo.parse(treated_episode_subtitle_file_path)
-            for attribute, value in correct_track_info.items():
-                assert getattr(media_info.text_tracks[0], attribute) == value
+        name, season_name, season = get_tvshow_info(
+            season_number, imdb_id=imdb_id
+        )
+        season_directory = tvshows_directory / name / season_name
+        destination_directory = Path(f'{season_directory} Edited')
+        assert destination_directory.exists()
+
+        for episode in season['episodes'][:available_episode_count]:
+            ename = episode['name']
+            enumber = episode['episode_number']
+
+            treated_episode_subtitle_file_path = (
+                destination_directory.joinpath(
+                    f'{name} - S{season_number:02d}E{enumber:02d} - {ename}'
+                    f'.{language_code}{suffix}',
+                )
+            )
+            assert treated_episode_subtitle_file_path.exists()
+
+            if include_full_information:
+                media_info = MediaInfo.parse(
+                    treated_episode_subtitle_file_path
+                )
+                subtitle_track = media_info.text_tracks[0]
+                for attribute, value in correct_track_info.items():
+                    assert getattr(subtitle_track, attribute) == value
+
+
+def test_treat_fail_extract_episode_number(
+    tmdb_api_key: str,
+    tvshows_directory: Path,
+) -> None:
+    imdb_id = 'tt2442560'
+    language_code = 'per'
+    source = 'TinyMoviez'
+    release_format = 'WEB-DL'
+    season_number = 4
+    match = r'File name did not match with episode number pattern\.'
+    medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
+    with pytest.raises(ValueError, match=match):
+        medicure.treat_media(
+            imdb_id,
+            {r'\.mkv': 0},
+            language_code,
+            source,
+            release_format,
+            [],
+            season_number,
+        )
+    with pytest.raises(ValueError, match=match):
+        medicure.treat_subtitle(
+            imdb_id,
+            {r'\.mkv': 0},
+            language_code,
+            source,
+            release_format,
+            season_number=season_number,
+        )
