@@ -7,8 +7,7 @@ from typing import DefaultDict, Dict, List, Optional
 
 import tmdbsimple as tmdb
 import typer
-from iso639 import languages
-from pymediainfo import MediaInfo
+from pymediainfo import MediaInfo, Track
 
 from medicure.data_structures import DubbingSupplier, FileInfo
 from medicure.utils import (
@@ -407,29 +406,21 @@ class Medicure:
                 self._video_track_id = track.track_id - 1
                 continue
 
-            track_types = {
+            track_type_to_mediainfo_track_type = {
                 'audio': 'Audio',
                 'subtitle': 'Text',
             }
-            for tt in track_types:
-                if track.track_type == track_types[tt]:
+            for tt, mitt in track_type_to_mediainfo_track_type.items():
+                if track.track_type == mitt:
                     for ds in self._dubbing_suppliers:
                         if (
                             not getattr(ds, f'_has_{tt}')
                             and file_info.id == ds.file_id
-                            and (
-                                self._match(
-                                    getattr(ds, f'{tt}_search_pattern'),
-                                    track.title,
-                                )
-                                or (
-                                    getattr(ds, f'{tt}_language_code') is None
-                                    and track.language is None
-                                )
-                                or getattr(ds, f'{tt}_language_code')
-                                == languages.get(
-                                    part1=track.language,
-                                ).part2b
+                            and self._track_title_match(
+                                track, getattr(ds, f'{tt}_search_pattern')
+                            )
+                            and self._track_language_match(
+                                track, getattr(ds, f'{tt}_language_code')
                             )
                         ):
                             setattr(
@@ -437,7 +428,8 @@ class Medicure:
                                 f'_{tt}_track_id',
                                 (track.track_id or 1) - 1,
                             )
-                    continue
+                            break
+                    break
 
     def _reset_tracks_info(self) -> None:
         for ds in self._dubbing_suppliers:
@@ -564,9 +556,19 @@ class Medicure:
         )
 
     @staticmethod
-    def _match(pattern: str, string: str) -> bool:
-        if pattern == r'':
+    def _track_title_match(track: Track, pattern: str) -> bool:
+        title = track.title
+        if pattern is None and title is None:
             return True
-        if pattern is None or string is None:
+        if pattern is None or title is None:
             return False
-        return re.search(pattern, string) is not None
+        return re.search(pattern, title) is not None
+
+    @staticmethod
+    def _track_language_match(track: Track, language_code: str) -> bool:
+        language = track.language
+        if language_code is None and language is None:
+            return True
+        if language_code is None or language is None:
+            return False
+        return language_code in track.other_language
