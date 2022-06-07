@@ -9,13 +9,12 @@ def extract_episode_number(file_name: Path) -> int:
     """
     Extracts episode number from file name
     """
-    for pattern in (r'(?<=[xXeE])\d{2}', r'\d{1,2}'):
-        match = re.search(pattern, str(file_name))
-        if match is not None:
-            episode_number = int(match.group())
-            return episode_number
+    match = re.search(r'(?<=[eE])\d{2}', str(file_name))
+    if match is not None:
+        episode_number = int(match.group())
+        return episode_number
 
-    raise ValueError('File name did not match to any pattern.')
+    raise ValueError('File name did not match with episode number pattern.')
 
 
 def get_movie_name(
