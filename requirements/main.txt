@@ -1,5 +1,4 @@
 tmdbsimple
 pymediainfo
-iso-639
 click
 typer
