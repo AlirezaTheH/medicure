@@ -56,8 +56,6 @@ class DubbingSupplier:
             tt = item.split('_')[-1]
             return self.__getattribute__(f'_{tt}_track_id') is not None
 
-        return self.__getattribute__(item)
-
 
 @dataclass
 class FileInfo:
