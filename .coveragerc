@@ -1,0 +1,9 @@
+[run]
+source = medicure
+omit =
+    medicure/version.py
+    */__init__.py
+
+[report]
+show_missing = True
+skip_covered = True
