@@ -373,7 +373,7 @@ class Medicure:
 
             assert (
                 not include_full_information or file_name.suffix != '.sub'
-            ), '.sub files does not contain any information.'
+            ), 'Files with .sub suffix does not contain any information.'
 
             file_infos = getattr(self, f'_{directory_type}_file_infos')
             if directory_type == 'season':
