@@ -394,33 +394,81 @@ def test_treat_subtitle(
                     assert getattr(subtitle_track, attribute) == value
 
 
-def test_treat_fail_extract_episode_number(
+def test_treat_with_no_collection_info(tmdb_api_key: str) -> None:
+    match = '{0}s directory has been not given for a {1}.'
+    medicure = Medicure(tmdb_api_key)
+
+    # Movie
+    imdb_id = 'tt1877830'
+    movie_match = match.format('Movie', 'movie')
+    with pytest.raises(AssertionError, match=movie_match):
+        medicure.treat_media(imdb_id, {}, '', '', '', [])
+
+    with pytest.raises(AssertionError, match=movie_match):
+        medicure.treat_subtitle(imdb_id, {}, '', '', '')
+
+    # TV show
+    imdb_id = 'tt2442560'
+    season_number = 6
+    tvshow_match = match.format('TV show', 'TV show')
+    with pytest.raises(AssertionError, match=tvshow_match):
+        medicure.treat_media(imdb_id, {}, '', '', '', [], season_number)
+
+    with pytest.raises(AssertionError, match=tvshow_match):
+        medicure.treat_subtitle(
+            imdb_id, {}, '', '', '', season_number=season_number
+        )
+
+
+def test_treat_with_no_season_number(
+    tmdb_api_key: str, tvshows_directory: Path
+) -> None:
+    imdb_id = 'tt2442560'
+    match = '`season_number` has not been given for a TV show.'
+    medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
+    with pytest.raises(AssertionError, match=match):
+        medicure.treat_media(imdb_id, {}, '', '', '', [])
+
+    with pytest.raises(AssertionError, match=match):
+        medicure.treat_subtitle(imdb_id, {}, '', '', '')
+
+
+def test_treat_sub_file_with_include_full_information(
+    tmdb_api_key: str, movies_directory: Path, tvshows_directory: Path
+) -> None:
+    file_search_pattern_to_id = {r'\.sub': 0}
+    match = 'Files with .sub suffix does not contain any information.'
+    medicure = Medicure(tmdb_api_key, movies_directory, tvshows_directory)
+
+    # Movie
+    imdb_id = 'tt1877830'
+    with pytest.raises(AssertionError, match=match):
+        medicure.treat_subtitle(
+            imdb_id, file_search_pattern_to_id, '', '', '', True
+        )
+
+    # TV show
+    imdb_id = 'tt2442560'
+    season_number = 5
+    with pytest.raises(AssertionError, match=match):
+        medicure.treat_subtitle(
+            imdb_id, file_search_pattern_to_id, '', '', '', True, season_number
+        )
+
+
+def test_treat_with_invalid_file_names(
     tmdb_api_key: str,
     tvshows_directory: Path,
 ) -> None:
     imdb_id = 'tt2442560'
-    language_code = 'per'
-    source = 'TinyMoviez'
-    release_format = 'WEB-DL'
     season_number = 4
-    match = r'File name did not match with episode number pattern\.'
+    match = 'File name did not match with episode number pattern.'
     medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
     with pytest.raises(ValueError, match=match):
         medicure.treat_media(
-            imdb_id,
-            {r'\.mkv': 0},
-            language_code,
-            source,
-            release_format,
-            [],
-            season_number,
+            imdb_id, {r'\.mkv': 0}, '', '', '', [], season_number
         )
     with pytest.raises(ValueError, match=match):
         medicure.treat_subtitle(
-            imdb_id,
-            {r'\.mkv': 0},
-            language_code,
-            source,
-            release_format,
-            season_number=season_number,
+            imdb_id, {r'\.srt': 0}, '', '', '', season_number=season_number
         )
