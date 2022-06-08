@@ -3,7 +3,7 @@
 [![Python Versions](https://img.shields.io/pypi/pyversions/medicure)](https://pypi.org/project/medicure)
 
 # Medicure
-Medicure is a cosmetic treatment for your media files: movies, tv shows
+Medicure is a cosmetic treatment for your media files: movies, TV shows
 and also their subtitles. Medicure provides a command-line tool and also
 a Python package for you.
 
@@ -13,7 +13,7 @@ which means "care".
 
 ## Requirements
 - [TMDB](https://www.themoviedb.org) API Key: Medicure uses TMDB's API to get
-  correct info for movies and tv shows. So you need to create a TMDB account
+  correct info for movies and TV shows. So you need to create a TMDB account
   and generate an API key inorder to use Medicure.
 - [Mediainfo](https://mediaarea.net/en/MediaInfo): Medicure requires Mediainfo
   to extract track info from video and audio files.
@@ -32,13 +32,13 @@ pip install git+https://github.com/alirezatheh/medicure.git
 ```
 
 ## Simple Example
-In this example we want to treat video files of Season 6 of the famous tv show
+In this example we want to treat video files of Season 6 of the famous TV show
 [Peaky Blinders](https://en.wikipedia.org/wiki/Peaky_Blinders_(TV_series))
 downloaded from [PSArips](https://psa.pm).
 
-First we search the name of tv show in [TMDB](https://www.themoviedb.org) to
+First we search the name of TV show in [TMDB](https://www.themoviedb.org) to
 see season names. In this case season name starts with `Series`. In our
-tv shows directory we create `Peaky Blinders/Series 6` directory and put the
+TV shows directory we create `Peaky Blinders/Series 6` directory and put the
 files there. directory structure will look like this:
 ```bash
 TV Shows
@@ -89,7 +89,7 @@ medicure = Medicure(
     tvshows_directory=Path('path/to/tvshows_directory'),
 )
 medicure.treat_media(
-    # You can find this in url of tv show in imdb.
+    # You can find this in url of TV show in imdb.
     imdb_id='tt2442560',
     file_search_pattern_to_id=file_search_pattern_to_id,
     video_language_code='eng',
@@ -133,7 +133,7 @@ Let's treat the above example using Medicure's command-line
 interface.
 
 Since we're using CLI for the first time, we need to save our
-TMDB API key and tv shows directory locally:
+TMDB API key and TV shows directory locally:
 ```bash
 medicure save tmdb-info YOUR_TMDB_API_KEY
 ```
@@ -154,12 +154,12 @@ medicure treat media \
 ```
 
 ## Directory Scanning
-- Tv Shows: As showed above Medicure expects following structure for your
-  tv shows directory:
+- TV shows: As showed above Medicure expects following structure for your
+  TV shows directory:
   ```bash
-  {Your tv shows directory}
-  └── {TV Show name on TMDB}
-      └── {TV Show season name on TMDB}
+  {Your TV shows directory}
+  └── {TV show name on TMDB}
+      └── {TV show season name on TMDB}
           └── {Episde files}
   ```
 - Movies: And for movies directory Medicure expects:

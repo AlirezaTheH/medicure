@@ -68,7 +68,7 @@ def treat_media(
             create_sub_param_help(
                 'name: str',
                 'Name of dubbing supplier, if dubbing supplier represents',
-                "original audio of movie or tv show this doesn't matter but",
+                "original audio of movie or TV show this doesn't matter but",
                 "should set to `'original'` for better convenience.",
             ),
             create_sub_param_help(
@@ -107,7 +107,7 @@ def treat_media(
         None,
         help=create_param_help(
             ': int',
-            'If `IMDB_ID` is a tv show, season number should be given.',
+            'If `IMDB_ID` is a TV show, season number should be given.',
         ),
     ),
 ) -> None:
@@ -191,7 +191,7 @@ def treat_subtitle(
         None,
         help=create_param_help(
             ': int',
-            'If `IMDB_ID` is a tv show, season number should be given.',
+            'If `IMDB_ID` is a TV show, season number should be given.',
         ),
     ),
 ) -> None:

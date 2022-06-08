@@ -44,8 +44,8 @@ class Medicure:
             movie.
 
         tvshows_directory: Path, optional
-            Your tv shows' directory, this should be given for treating
-            a tv show.
+            Your TV shows' directory, this should be given for treating
+            a TV show.
         """
         tmdb.API_KEY = tmdb_api_key
         self._movies_directory = movies_directory
@@ -97,7 +97,7 @@ class Medicure:
             List of possible dubbing suppliers
 
         season_number: int, optional
-            If imdb_id is a tv show, season number should be given.
+            If imdb_id is a TV show, season number should be given.
         """
         self._dubbing_suppliers = dubbing_suppliers
 
@@ -139,14 +139,14 @@ class Medicure:
                 )
             )
 
-        # If id is a tv show
+        # If id is a TV show
         elif info['tv_results']:
             assert (
                 self._tvshows_directory is not None
-            ), 'tv shows directory has been not given for a tv show.'
+            ), 'TV shows directory has been not given for a TV show.'
             assert (
                 season_number is not None
-            ), '`season_number` has not been given for a tv show.'
+            ), '`season_number` has not been given for a TV show.'
 
             name, season_name, season = get_tvshow_info(season_number, info)
             season_directory = self._tvshows_directory / name / season_name
@@ -237,7 +237,7 @@ class Medicure:
             should also be given.
 
         season_number: int, optional
-            If imdb_id is a tv show season number should be given.
+            If imdb_id is a TV show season number should be given.
         """
         # Getting info from TMDB
         find = tmdb.Find(imdb_id)
@@ -296,14 +296,14 @@ class Medicure:
                         f'copied and renamed to: {final_file_path}.',
                     )
 
-        # If id is a tv show
+        # If id is a TV show
         elif info['tv_results']:
             assert (
                 self._tvshows_directory is not None
-            ), 'tv shows directory has been not given for a tv show.'
+            ), 'TV shows directory has been not given for a TV show.'
             assert (
                 season_number is not None
-            ), '`season_number` has not been given for a tv show.'
+            ), '`season_number` has not been given for a TV show.'
 
             name, season_name, season = get_tvshow_info(season_number, info)
             season_directory = self._tvshows_directory / name / season_name

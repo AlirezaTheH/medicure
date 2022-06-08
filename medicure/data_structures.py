@@ -12,7 +12,7 @@ class DubbingSupplier:
     ----------
     name: str
         Name of dubbing supplier, if dubbing supplier represents
-        original audio of movie or tv show this doesn't matter but
+        original audio of movie or TV show this doesn't matter but
         should set to `'original'` for better convenience.
 
     file_id: int

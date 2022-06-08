@@ -28,7 +28,7 @@ setup(
     version=version,
     description=(
         'A cosmetic treatment for your media files: '
-        'movies, tv shows and also their subtitles.'
+        'movies, TV shows and also their subtitles.'
     ),
     long_description=long_description,
     long_description_content_type='text/markdown',

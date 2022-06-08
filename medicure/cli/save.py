@@ -61,7 +61,7 @@ def save_collection_info(
         writable=True,
         allow_dash=True,
         help=create_param_help(
-            'Directory of your tv shows, must be given if',
+            'Directory of your TV shows, must be given if',
             '`--movies-directory` has been not given.',
             internal=True,
             option=True,
