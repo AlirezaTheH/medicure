@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 ### Added
+- Added pre-commit ci support
 - Added Codecov support
 - Added CLI tests
 - Added TMDB mocks to minimize tests' runtime

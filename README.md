@@ -1,9 +1,10 @@
-[![tests](https://github.com/alirezatheh/medicure/workflows/tests/badge.svg)](https://github.com/alirezatheh/medicure/actions)
+# Medicure
+[![tests](https://github.com/alirezatheh/medicure/workflows/tests/badge.svg)](https://github.com/alirezatheh/medicure/actions/workflows/tests.yaml)
 [![codecov](https://codecov.io/gh/alirezatheh/medicure/branch/main/graph/badge.svg)](https://codecov.io/gh/alirezatheh/medicure)
+[![pre-commit.ci](https://results.pre-commit.ci/badge/github/AlirezaTheH/medicure/main.svg)](https://results.pre-commit.ci/latest/github/alirezatheh/medicure/main)
 [![PyPI Version](https://img.shields.io/pypi/v/medicure)](https://pypi.python.org/pypi/medicure)
 [![Python Versions](https://img.shields.io/pypi/pyversions/medicure)](https://pypi.org/project/medicure)
 
-# Medicure
 Medicure is a cosmetic treatment for your media files: movies, TV shows
 and also their subtitles. Medicure provides a command-line tool and also
 a Python package for you.
