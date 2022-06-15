@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import MISSING, dataclass, fields
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -55,6 +55,52 @@ class DubbingSupplier:
         if item in ('_has_audio', '_has_subtitle'):
             tt = item.split('_')[-1]
             return self.__getattribute__(f'_{tt}_track_id') is not None
+
+    def to_list(self) -> List[Any]:
+        """
+        Converts dubbing supplier to a minimal list so can be easily in
+        Medicure's CLI.
+
+        Returns
+        -------
+        result: list[Any]
+            List dubbing supplier
+        """
+        ds_list = []
+        last_append_index = 0
+        for i, field in enumerate(fields(self)):
+            field_value = self.__getattribute__(field.name)
+
+            if field.default == MISSING:
+                ds_list.append(field_value)
+                last_append_index = i
+
+            elif field_value != field.default:
+                for f in fields(self)[last_append_index + 1 : i]:
+                    ds_list.append(self.__getattribute__(f.name))
+                ds_list.append(field_value)
+                last_append_index = i
+
+        return ds_list
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Converts dubbing supplier to a minimal dictionary so can be
+        easily used in Medicure's CLI.
+
+        Returns
+        -------
+        result: dict[str, Any]
+            Dictionary dubbing supplier
+        """
+
+        ds_dict = {}
+        for field in fields(self):
+            field_value = self.__getattribute__(field.name)
+            if field_value != field.default:
+                ds_dict[field.name] = field_value
+
+        return ds_dict
 
 
 @dataclass

@@ -8,6 +8,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 ### Added
+- Added `to_list` and `to_dict` converters to `DubbingSupplier` so can be
+  easily used in Medicure's CLI.
 - Added tests workflow
 - Added treat tests
 - Enabled direct subtitle injecting when treating media
