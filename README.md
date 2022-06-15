@@ -91,7 +91,7 @@ medicure = Medicure(
     tvshows_directory=Path('path/to/tvshows_directory'),
 )
 medicure.treat_media(
-    # You can find this in url of TV show in imdb.
+    # You can find this in url of TV show in IMDb.
     imdb_id='tt2442560',
     file_search_pattern_to_id=file_search_pattern_to_id,
     video_language_code='eng',

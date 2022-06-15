@@ -21,7 +21,7 @@ app.add_typer(treat_app, name='treat')
 @treat_app.command('media')
 def treat_media(
     imdb_id: str = typer.Argument(
-        ..., help=create_param_help(': str', 'IMDB id')
+        ..., help=create_param_help(': str', 'IMDb id')
     ),
     file_search_pattern_to_id: Dict[str, int] = typer.Argument(
         ...,
@@ -137,7 +137,7 @@ def treat_media(
 @treat_app.command('subtitle')
 def treat_subtitle(
     imdb_id: str = typer.Argument(
-        ..., help=create_param_help(': str', 'IMDB id')
+        ..., help=create_param_help(': str', 'IMDb id')
     ),
     file_search_pattern_to_id: Dict[str, int] = typer.Argument(
         ...,

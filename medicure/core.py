@@ -73,7 +73,7 @@ class Medicure:
         Parameters
         ----------
         imdb_id: str
-            IMDB id
+            IMDb id
 
         file_search_pattern_to_id: dict[str, int]
             Dict of patterns for finding files to file ids
@@ -96,7 +96,7 @@ class Medicure:
             List of possible dubbing suppliers
 
         season_number: int, optional
-            If imdb_id is a TV show, season number should be given.
+            If `imdb_id` is a TV show, season number should be given.
         """
         self._dubbing_suppliers = dubbing_suppliers
 
@@ -207,7 +207,7 @@ class Medicure:
         Parameters
         ----------
         imdb_id: str
-            IMDB id
+            IMDb id
 
         file_search_pattern_to_id: dict[str, int]
             Dict of patterns for finding files to file ids
@@ -236,7 +236,7 @@ class Medicure:
             should also be given.
 
         season_number: int, optional
-            If imdb_id is a TV show season number should be given.
+            If `imdb_id` is a TV show season number should be given.
         """
         if include_full_information:
             assert source is not None and release_format is not None, (
