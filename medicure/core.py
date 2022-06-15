@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import DefaultDict, Dict, List, Optional
 
 import tmdbsimple as tmdb
-import typer
 from pymediainfo import MediaInfo, Track
 
 from medicure.data_structures import DubbingSupplier, FileInfo
@@ -239,9 +238,14 @@ class Medicure:
         season_number: int, optional
             If imdb_id is a TV show season number should be given.
         """
+        if include_full_information:
+            assert source is not None and release_format is not None, (
+                'When `include_full_information` is `True`, '
+                '`source` and `release_format` should be given.'
+            )
+
         # Getting info from TMDB
-        find = tmdb.Find(imdb_id)
-        info = find.info(external_source='imdb_id')
+        info = tmdb.Find(imdb_id).info(external_source='imdb_id')
 
         track_config = (
             '--language 0:{lc} '
@@ -291,7 +295,7 @@ class Medicure:
                         ext=original_file_path.suffix,
                     )
                     shutil.copyfile(original_file_path, final_file_path)
-                    typer.echo(
+                    print(
                         f'The file: {original_file_path} '
                         f'copied and renamed to: {final_file_path}.',
                     )
@@ -348,7 +352,7 @@ class Medicure:
                             ext=original_file_path.suffix,
                         )
                         shutil.copyfile(original_file_path, final_file_path)
-                        typer.echo(
+                        print(
                             f'The file: {original_file_path} '
                             f'copied and renamed to : {final_file_path}.',
                         )
@@ -371,10 +375,6 @@ class Medicure:
             if re.search(file_suffix_pattern, file_name.suffix) is None:
                 continue
 
-            assert (
-                not include_full_information or file_name.suffix != '.sub'
-            ), 'Files with .sub suffix does not contain any information.'
-
             file_infos = getattr(self, f'_{directory_type}_file_infos')
             if directory_type == 'season':
                 file_infos = file_infos[extract_episode_number(file_name)]
@@ -382,6 +382,10 @@ class Medicure:
             for pattern in file_search_pattern_to_id:
                 if re.search(pattern, str(file_name)) is None:
                     continue
+
+                assert (
+                    not include_full_information or file_name.suffix != '.sub'
+                ), 'Files with .sub suffix does not contain any information.'
 
                 file_infos.append(
                     FileInfo(
