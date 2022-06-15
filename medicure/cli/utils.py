@@ -9,14 +9,14 @@ import typer
 
 def get_base_path() -> Path:
     """
-    Get base path for medicure
+    Get base path for Medicure
     """
     os_base_path = {
-        'Windows': '~\\AppData\\Local\\Programs',
-        'Darwin': '~/Library/Application Support',
-        'Linux': '~/.config',
+        'Windows': '~\\AppData\\Local\\Medicure',
+        'Darwin': '~/.medicure',
+        'Linux': '~/.medicure',
     }
-    base_path = Path(os_base_path[platform.system()]).expanduser() / 'medicure'
+    base_path = Path(os_base_path[platform.system()]).expanduser()
     if not base_path.exists():
         base_path.mkdir()
 

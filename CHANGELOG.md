@@ -10,7 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Added TMDB mocks to minimize tests' runtime
 - Added `to_list` and `to_dict` converters to `DubbingSupplier` so can be
-  easily used in Medicure's CLI.
+  easily used in Medicure's CLI
 - Added tests workflow
 - Added treat tests
 - Enabled direct subtitle injecting when treating media
@@ -18,8 +18,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Medicure now keeps actions up to date with Dependabot
 
 ### Changed
+- Updated Medicure's CLI base path for all platforms
 - Improved tests' parameterizing
-- Changed Typer patch method to use pure patch files.
+- Changed Typer patch method to use pure patch files
 - Improved treat tests code coverage
 - Improved extracting episode number from file names
 - Improved saving file tracks' info
