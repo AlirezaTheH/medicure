@@ -4,8 +4,26 @@ from pathlib import Path
 import patch
 
 
+def get_typer_path() -> Path:
+    """
+    Gets correct Typer path for all platforms.
+
+    Returns
+    -------
+    path: Path
+        The Typer path
+    """
+    for path in site.getsitepackages():
+        if path.endswith('site-packages'):
+            return Path(path) / 'typer'
+
+
 def patch_param_type() -> None:
-    typer_path = Path(site.getsitepackages()[0]) / 'typer'
+    """
+    Patches Typer with Click's ParamTypes.
+    """
+
+    typer_path = get_typer_path()
     with open(typer_path / '__init__.py') as f:
         if '_patched_by_medicure = True' in f.read():
             return

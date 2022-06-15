@@ -19,7 +19,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 - Improved tests' parameterizing
-- Changed typer patch method to use pure patch files.
+- Changed Typer patch method to use pure patch files.
 - Improved treat tests code coverage
 - Improved extracting episode number from file names
 - Improved saving file tracks' info
@@ -30,6 +30,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   from the original files.
 
 ### Fixed
+- Fixed Typer patch bug in Windows
 - Fixed a bug in treating `.sub` files
 - Fixed CLI's error messages
 - Fixed publish workflow's pip caching
@@ -51,7 +52,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Reformatted `CHANGELOG.md` to
   [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format
 - Improved media and subtitle patterns
-- Improved typer patch speed
+- Improved Typer patch speed
 
 ### Fixed
 - Add `MANIFEST.in` to include extras requirements in source builds
