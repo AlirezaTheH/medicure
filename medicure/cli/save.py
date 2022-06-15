@@ -27,10 +27,7 @@ def save_tmdb_info(
     with open(info_path, 'w') as f:
         json.dump(info, f, indent=4, sort_keys=True, ensure_ascii=False)
 
-    typer.secho(
-        'Your TMDB info has been saved successfully.',
-        fg='green',
-    )
+    typer.secho('Your TMDB info has been saved successfully.', fg='green')
 
 
 @save_app.command('collection-info')
@@ -89,6 +86,5 @@ def save_collection_info(
         json.dump(info, f, indent=4, sort_keys=True, ensure_ascii=False)
 
     typer.secho(
-        'Your collection info has been saved successfully.',
-        fg='green',
+        'Your collection info has been saved successfully.', fg='green'
     )
