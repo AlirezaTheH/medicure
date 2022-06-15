@@ -1,474 +1,217 @@
-from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import pytest
-from pymediainfo import MediaInfo
 
 from medicure.core import Medicure
-from medicure.data_structures import DubbingSupplier
-from medicure.utils import get_movie_name, get_tvshow_info
-
-
-@pytest.mark.parametrize(
-    'file_search_pattern_to_id, dubbing_suppliers, correct_tracks_info',
-    [
-        # Single file with a dummy dubbing supplier
-        (
-            {r'\.mkv': 0},
-            [
-                # Dummy, won't match with any track.
-                DubbingSupplier(
-                    name='original',
-                    file_id=0,
-                    correct_language_code='eng',
-                ),
-                DubbingSupplier(
-                    name='original',
-                    file_id=0,
-                    correct_language_code='eng',
-                    audio_language_code='eng',
-                    subtitle_language_code='eng',
-                ),
-            ],
-            [
-                {
-                    'track_id': 1,
-                    'track_type': 'Video',
-                    'title': 'PSA WEB-DL',
-                    'language': 'en',
-                    'default': 'Yes',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 2,
-                    'track_type': 'Audio',
-                    'title': None,
-                    'language': 'en',
-                    'default': 'Yes',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 3,
-                    'track_type': 'Text',
-                    'title': None,
-                    'language': 'en',
-                    'default': 'No',
-                    'forced': 'No',
-                },
-            ],
-        ),
-        # An extra audio file with a dummy dubbing supplier
-        (
-            {r'\.mkv': 0, r'\.mka': 1},
-            [
-                DubbingSupplier(
-                    name='original',
-                    file_id=0,
-                    correct_language_code='eng',
-                    audio_language_code='eng',
-                    subtitle_language_code='eng',
-                ),
-                # Dummy, won't match with any track.
-                DubbingSupplier(
-                    name='TinyMoviez',
-                    file_id=1,
-                    correct_language_code='per',
-                ),
-                DubbingSupplier(
-                    name='TinyMoviez',
-                    file_id=1,
-                    correct_language_code='per',
-                    audio_search_pattern=r'TinyMoviez\.co',
-                ),
-            ],
-            [
-                {
-                    'track_id': 1,
-                    'track_type': 'Video',
-                    'title': 'PSA WEB-DL',
-                    'language': 'en',
-                    'default': 'Yes',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 2,
-                    'track_type': 'Audio',
-                    'title': None,
-                    'language': 'en',
-                    'default': 'Yes',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 3,
-                    'track_type': 'Audio',
-                    'title': 'TinyMoviez',
-                    'language': 'fa',
-                    'default': 'No',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 4,
-                    'track_type': 'Text',
-                    'title': None,
-                    'language': 'en',
-                    'default': 'No',
-                    'forced': 'No',
-                },
-            ],
-        ),
-        # An extra subtitle file
-        (
-            {r'\.mkv': 0, r'\.srt': 1},
-            [
-                DubbingSupplier(
-                    name='original',
-                    file_id=0,
-                    correct_language_code='eng',
-                    audio_language_code='eng',
-                    subtitle_language_code='eng',
-                ),
-                DubbingSupplier(
-                    name='TinyMoviez',
-                    file_id=1,
-                    correct_language_code='per',
-                ),
-            ],
-            [
-                {
-                    'track_id': 1,
-                    'track_type': 'Video',
-                    'title': 'PSA WEB-DL',
-                    'language': 'en',
-                    'default': 'Yes',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 2,
-                    'track_type': 'Audio',
-                    'title': None,
-                    'language': 'en',
-                    'default': 'Yes',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 3,
-                    'track_type': 'Text',
-                    'title': None,
-                    'language': 'en',
-                    'default': 'No',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 4,
-                    'track_type': 'Text',
-                    'title': 'TinyMoviez',
-                    'language': 'fa',
-                    'default': 'No',
-                    'forced': 'No',
-                },
-            ],
-        ),
-        # Extra audio and subtitle files
-        (
-            {r'\.mkv': 0, r'\.mka': 1, r'\.srt': 2},
-            [
-                DubbingSupplier(
-                    name='original',
-                    file_id=0,
-                    correct_language_code='eng',
-                    audio_language_code='eng',
-                    subtitle_language_code='eng',
-                ),
-                DubbingSupplier(
-                    name='TinyMoviez',
-                    file_id=1,
-                    correct_language_code='per',
-                    audio_search_pattern=r'TinyMoviez\.co',
-                ),
-                DubbingSupplier(
-                    name='TinyMoviez',
-                    file_id=2,
-                    correct_language_code='per',
-                ),
-            ],
-            [
-                {
-                    'track_id': 1,
-                    'track_type': 'Video',
-                    'title': 'PSA WEB-DL',
-                    'language': 'en',
-                    'default': 'Yes',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 2,
-                    'track_type': 'Audio',
-                    'title': None,
-                    'language': 'en',
-                    'default': 'Yes',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 3,
-                    'track_type': 'Audio',
-                    'title': 'TinyMoviez',
-                    'language': 'fa',
-                    'default': 'No',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 4,
-                    'track_type': 'Text',
-                    'title': None,
-                    'language': 'en',
-                    'default': 'No',
-                    'forced': 'No',
-                },
-                {
-                    'track_id': 5,
-                    'track_type': 'Text',
-                    'title': 'TinyMoviez',
-                    'language': 'fa',
-                    'default': 'No',
-                    'forced': 'No',
-                },
-            ],
-        ),
-    ],
+from tests.parameterize import *
+from tests.utils import (
+    validate_movie_media_file,
+    validate_movie_subtitle_file,
+    validate_tvshow_media_files,
+    validate_tvshow_subtitle_files,
 )
-def test_treat_media(
-    tmdb_api_key: str,
-    movies_directory: Path,
-    tvshows_directory: Path,
+
+
+@pytest.mark.parametrize(*treat_media_args)
+def test_treat_movie_media(
     file_search_pattern_to_id: Dict[str, int],
     dubbing_suppliers: List[DubbingSupplier],
-    correct_tracks_info: List[Dict[str, Any]],
+    correct_tracks: List[Track],
 ) -> None:
-    medicure = Medicure(tmdb_api_key, movies_directory, tvshows_directory)
-    video_language_code = 'eng'
-    video_source = 'PSA'
-    video_release_format = 'WEB-DL'
-
-    # Movie
-    imdb_id = 'tt1877830'
+    medicure = Medicure(tmdb_api_key, movies_directory)
     medicure.treat_media(
-        imdb_id,
+        movie_imdb_id,
         file_search_pattern_to_id,
         video_language_code,
         video_source,
         video_release_format,
         dubbing_suppliers,
     )
-
-    movie_name = get_movie_name(imdb_id=imdb_id)
-    movie_directory = movies_directory / movie_name
-    destination_directory = Path(f'{movie_directory} Edited')
-    assert destination_directory.exists()
-
-    treated_movie_file_path = destination_directory / f'{movie_name}.mkv'
-    assert treated_movie_file_path.exists()
-
-    media_info = MediaInfo.parse(treated_movie_file_path)
-    for i, track in enumerate(media_info.tracks[1:]):
-        for attribute, value in correct_tracks_info[i].items():
-            assert getattr(track, attribute) == value
-
-    # TV Show
-    imdb_id = 'tt2442560'
-    for season_number, available_episode_count in {5: 1, 6: 6}.items():
-        medicure.treat_media(
-            imdb_id,
-            file_search_pattern_to_id,
-            video_language_code,
-            video_source,
-            video_release_format,
-            dubbing_suppliers,
-            season_number,
-        )
-        name, season_name, season = get_tvshow_info(
-            season_number, imdb_id=imdb_id
-        )
-        season_directory = tvshows_directory / name / season_name
-        destination_directory = Path(f'{season_directory} Edited')
-        assert destination_directory.exists()
-
-        for episode in season['episodes'][:available_episode_count]:
-            ename = episode['name']
-            enumber = episode['episode_number']
-
-            treated_episode_file_path = destination_directory.joinpath(
-                f'{name} - S{season_number:02d}E{enumber:02d} - {ename}.mkv',
-            )
-            assert treated_episode_file_path.exists()
-
-            media_info = MediaInfo.parse(treated_episode_file_path)
-            for i, track in enumerate(media_info.tracks[1:]):
-                for attribute, value in correct_tracks_info[i].items():
-                    assert getattr(track, attribute) == value
+    validate_movie_media_file(movie_imdb_id, correct_tracks, movies_directory)
 
 
-@pytest.mark.parametrize('include_full_information', [True, False])
-def test_treat_subtitle(
-    tmdb_api_key: str,
-    movies_directory: Path,
-    tvshows_directory: Path,
+@pytest.mark.parametrize(*season_info_args)
+@pytest.mark.parametrize(*treat_media_args)
+def test_treat_tvshow_media(
+    season_number: int,
+    available_episode_count: int,
+    file_search_pattern_to_id: Dict[str, int],
+    dubbing_suppliers: List[DubbingSupplier],
+    correct_tracks: List[Track],
+) -> None:
+    medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
+    medicure.treat_media(
+        tvshow_imdb_id,
+        file_search_pattern_to_id,
+        video_language_code,
+        video_source,
+        video_release_format,
+        dubbing_suppliers,
+        season_number,
+    )
+    validate_tvshow_media_files(
+        tvshow_imdb_id,
+        season_number,
+        available_episode_count,
+        correct_tracks,
+        tvshows_directory,
+    )
+
+
+@pytest.mark.parametrize(*treat_subtitle_args)
+def test_treat_movie_subtitle(
     include_full_information: bool,
+    suffix: str,
 ):
-    medicure = Medicure(tmdb_api_key, movies_directory, tvshows_directory)
-    language_code = 'per'
-    source = 'TinyMoviez'
-    release_format = 'WEB-DL'
-    suffix = '.mks' if include_full_information else '.srt'
-    correct_track_info = {
-        'track_id': 1,
-        'track_type': 'Text',
-        'title': f'{source} {release_format}',
-        'language': 'fa',
-        'default': 'Yes',
-        'forced': 'No',
-    }
-
-    # Movie
-    imdb_id = 'tt1877830'
+    medicure = Medicure(tmdb_api_key, movies_directory)
     medicure.treat_subtitle(
-        imdb_id,
-        {r'\.srt': 0},
-        language_code,
-        source,
-        release_format,
+        movie_imdb_id,
+        subtitle_file_search_pattern_to_id,
+        subtitle_language_code,
+        subtitle_source,
+        subtitle_release_format,
         include_full_information,
     )
-
-    movie_name = get_movie_name(imdb_id=imdb_id)
-    movie_directory = movies_directory / f'{movie_name}'
-    destination_directory = Path(f'{movie_directory} Edited')
-    assert destination_directory.exists()
-
-    treated_movie_subtitle_file_path = destination_directory.joinpath(
-        f'{movie_name}.{language_code}{suffix}'
+    validate_movie_subtitle_file(
+        movie_imdb_id,
+        subtitle_language_code,
+        suffix,
+        include_full_information,
+        subtitle_correct_track,
+        movies_directory,
     )
-    assert treated_movie_subtitle_file_path.exists()
-    if include_full_information:
-        media_info = MediaInfo.parse(treated_movie_subtitle_file_path)
-        for attribute, value in correct_track_info.items():
-            assert getattr(media_info.text_tracks[0], attribute) == value
-
-    # TV Show
-    imdb_id = 'tt2442560'
-    for season_number, available_episode_count in {5: 1, 6: 6}.items():
-        medicure.treat_subtitle(
-            imdb_id,
-            {r'\.srt': 0},
-            language_code,
-            source,
-            release_format,
-            include_full_information,
-            season_number,
-        )
-
-        name, season_name, season = get_tvshow_info(
-            season_number, imdb_id=imdb_id
-        )
-        season_directory = tvshows_directory / name / season_name
-        destination_directory = Path(f'{season_directory} Edited')
-        assert destination_directory.exists()
-
-        for episode in season['episodes'][:available_episode_count]:
-            ename = episode['name']
-            enumber = episode['episode_number']
-
-            treated_episode_subtitle_file_path = (
-                destination_directory.joinpath(
-                    f'{name} - S{season_number:02d}E{enumber:02d} - {ename}'
-                    f'.{language_code}{suffix}',
-                )
-            )
-            assert treated_episode_subtitle_file_path.exists()
-
-            if include_full_information:
-                media_info = MediaInfo.parse(
-                    treated_episode_subtitle_file_path
-                )
-                subtitle_track = media_info.text_tracks[0]
-                for attribute, value in correct_track_info.items():
-                    assert getattr(subtitle_track, attribute) == value
 
 
-def test_treat_with_no_collection_info(tmdb_api_key: str) -> None:
-    match = '{0}s directory has been not given for a {1}.'
+@pytest.mark.parametrize(*season_info_args)
+@pytest.mark.parametrize(*treat_subtitle_args)
+def test_treat_tvshow_subtitle(
+    season_number: int,
+    available_episode_count: int,
+    include_full_information: bool,
+    suffix: str,
+):
+    medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
+    medicure.treat_subtitle(
+        tvshow_imdb_id,
+        subtitle_file_search_pattern_to_id,
+        subtitle_language_code,
+        subtitle_source,
+        subtitle_release_format,
+        include_full_information,
+        season_number,
+    )
+    validate_tvshow_subtitle_files(
+        tvshow_imdb_id,
+        season_number,
+        available_episode_count,
+        subtitle_language_code,
+        suffix,
+        include_full_information,
+        subtitle_correct_track,
+        tvshows_directory,
+    )
+
+
+@pytest.mark.parametrize(
+    'imdb_id, match_format_args',
+    [
+        (movie_imdb_id, ('Movie', 'movie')),
+        (tvshow_imdb_id, ('TV show', 'TV show')),
+    ],
+)
+@pytest.mark.parametrize(
+    'treat_kind, extra_treat_args', [('media', ([],)), ('subtitle', ())]
+)
+def test_treat_with_no_collection_info(
+    imdb_id: str,
+    match_format_args: Tuple[str, str],
+    treat_kind: str,
+    extra_treat_args: Tuple[Any, ...],
+) -> None:
     medicure = Medicure(tmdb_api_key)
-
-    # Movie
-    imdb_id = 'tt1877830'
-    movie_match = match.format('Movie', 'movie')
-    with pytest.raises(AssertionError, match=movie_match):
-        medicure.treat_media(imdb_id, {}, '', '', '', [])
-
-    with pytest.raises(AssertionError, match=movie_match):
-        medicure.treat_subtitle(imdb_id, {}, '', '', '')
-
-    # TV show
-    imdb_id = 'tt2442560'
-    season_number = 6
-    tvshow_match = match.format('TV show', 'TV show')
-    with pytest.raises(AssertionError, match=tvshow_match):
-        medicure.treat_media(imdb_id, {}, '', '', '', [], season_number)
-
-    with pytest.raises(AssertionError, match=tvshow_match):
-        medicure.treat_subtitle(
-            imdb_id, {}, '', '', '', season_number=season_number
+    with pytest.raises(
+        AssertionError,
+        match='{0}s directory has been not given for a {1}.'.format(
+            *match_format_args
+        ),
+    ):
+        getattr(medicure, f'treat_{treat_kind}')(
+            imdb_id, {}, '', '', '', *extra_treat_args
         )
 
 
-def test_treat_with_no_season_number(
-    tmdb_api_key: str, tvshows_directory: Path
+@pytest.mark.parametrize(
+    'treat_kind, extra_treat_args', [('media', ([],)), ('subtitle', ())]
+)
+def test_treat_tvshow_with_no_season_number(
+    treat_kind: str,
+    extra_treat_args: Tuple[Any, ...],
 ) -> None:
-    imdb_id = 'tt2442560'
-    match = '`season_number` has not been given for a TV show.'
     medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
-    with pytest.raises(AssertionError, match=match):
-        medicure.treat_media(imdb_id, {}, '', '', '', [])
+    with pytest.raises(
+        AssertionError,
+        match='`season_number` has not been given for a TV show.',
+    ):
+        getattr(medicure, f'treat_{treat_kind}')(
+            tvshow_imdb_id, {}, '', '', '', *extra_treat_args
+        )
 
-    with pytest.raises(AssertionError, match=match):
-        medicure.treat_subtitle(imdb_id, {}, '', '', '')
 
-
-def test_treat_sub_file_with_include_full_information(
-    tmdb_api_key: str, movies_directory: Path, tvshows_directory: Path
+@pytest.mark.parametrize('imdb_id', [movie_imdb_id, tvshow_imdb_id])
+def test_treat_subtitle_with_include_full_information_and_no_information(
+    imdb_id: str,
 ) -> None:
-    file_search_pattern_to_id = {r'\.sub': 0}
-    match = 'Files with .sub suffix does not contain any information.'
     medicure = Medicure(tmdb_api_key, movies_directory, tvshows_directory)
-
-    # Movie
-    imdb_id = 'tt1877830'
-    with pytest.raises(AssertionError, match=match):
-        medicure.treat_subtitle(
-            imdb_id, file_search_pattern_to_id, '', '', '', True
-        )
-
-    # TV show
-    imdb_id = 'tt2442560'
-    season_number = 5
-    with pytest.raises(AssertionError, match=match):
-        medicure.treat_subtitle(
-            imdb_id, file_search_pattern_to_id, '', '', '', True, season_number
-        )
+    with pytest.raises(
+        AssertionError,
+        match=(
+            'When `include_full_information` is `True`, '
+            '`source` and `release_format` should be given.'
+        ),
+    ):
+        medicure.treat_subtitle(imdb_id, {}, '', None, None, True)
 
 
-def test_treat_with_invalid_file_names(
-    tmdb_api_key: str,
-    tvshows_directory: Path,
+@pytest.mark.parametrize(
+    'imdb_id, extra_treat_args', [(movie_imdb_id, ()), (tvshow_imdb_id, (5,))]
+)
+def test_treat_sub_file_with_include_full_information(
+    imdb_id: str,
+    extra_treat_args: Tuple[Any, ...],
 ) -> None:
-    imdb_id = 'tt2442560'
-    season_number = 4
-    match = 'File name did not match with episode number pattern.'
-    medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
-    with pytest.raises(ValueError, match=match):
-        medicure.treat_media(
-            imdb_id, {r'\.mkv': 0}, '', '', '', [], season_number
-        )
-    with pytest.raises(ValueError, match=match):
+    medicure = Medicure(tmdb_api_key, movies_directory, tvshows_directory)
+    with pytest.raises(
+        AssertionError,
+        match='Files with .sub suffix does not contain any information.',
+    ):
         medicure.treat_subtitle(
-            imdb_id, {r'\.srt': 0}, '', '', '', season_number=season_number
+            imdb_id, {r'\.sub': 0}, '', '', '', True, *extra_treat_args
+        )
+
+
+@pytest.mark.parametrize(
+    'treat_kind, file_search_pattern_to_id, extra_treat_args',
+    [
+        ('media', media_file_search_pattern_to_id, ([],)),
+        ('subtitle', subtitle_file_search_pattern_to_id, (False,)),
+    ],
+)
+def test_treat_tvshow_with_invalid_file_names(
+    treat_kind: str,
+    file_search_pattern_to_id: Dict[str, int],
+    extra_treat_args: Tuple[Any, ...],
+) -> None:
+    medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
+    with pytest.raises(
+        ValueError,
+        match='File name did not match with episode number pattern.',
+    ):
+        getattr(medicure, f'treat_{treat_kind}')(
+            tvshow_imdb_id,
+            file_search_pattern_to_id,
+            '',
+            '',
+            '',
+            *extra_treat_args,
+            4,
         )
