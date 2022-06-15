@@ -1,5 +1,6 @@
 import json
 import platform
+import re
 from pathlib import Path
 from typing import Dict
 
@@ -10,19 +11,12 @@ def get_base_path() -> Path:
     """
     Get base path for medicure
     """
-    base_path = None
-
-    # Windows
-    if platform.system() == 'Windows':
-        base_path = Path('~\\AppData\\Local\\Programs\\medicure')
-    # macOS
-    elif platform.system() == 'Darwin':
-        base_path = Path('~/Library/Application Support/medicure͏͏͏͏')
-    # Linux
-    elif platform.system() == 'Linux':
-        base_path = Path('~/.config/medicure')
-
-    base_path = base_path.expanduser()
+    os_base_path = {
+        'Windows': '~\\AppData\\Local\\Programs',
+        'Darwin': '~/Library/Application Support',
+        'Linux': '~/.config',
+    }
+    base_path = Path(os_base_path[platform.system()]).expanduser() / 'medicure'
     if not base_path.exists():
         base_path.mkdir()
 
@@ -37,7 +31,7 @@ def load_tmdb_info() -> Dict[str, str]:
     if not info_path.exists():
         typer.secho('Error: No TMDB info found.', err=True, fg='red')
         typer.secho(
-            'You need to save your TMDB info '
+            'Hint: You need to save your TMDB info '
             'with `medicure save tmdb-info` command.',
             fg='blue',
         )
@@ -95,3 +89,26 @@ def create_sub_param_help(*lines: str) -> str:
     Creates a beautiful help message for typer sub-parameter.
     """
     return '\b\n{}\n    {}\n'.format(lines[0], '\n    '.join(lines[1:]))
+
+
+def create_flag(flag: str) -> str:
+    """
+    Creates a CLI flag from a flag.
+    """
+    return f'--{flag.replace("_", "-")}'
+
+
+def create_error_message(message: str):
+    """
+    Create a CLI error message from a message.
+    """
+
+    def replacement(match: re.Match):
+        qs = match.group(1)
+        if qs == 'True':
+            return 'set'
+        elif qs.startswith('include'):
+            return f'`{create_flag(qs)}` flag'
+        return f'`{qs.upper()}`'
+
+    return re.sub(r'`([^`]+)`', replacement, message)

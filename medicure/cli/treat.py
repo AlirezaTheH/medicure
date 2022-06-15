@@ -5,6 +5,7 @@ import typer
 from medicure.cli.base import app
 from medicure.cli.types import DataList, Json
 from medicure.cli.utils import (
+    create_error_message,
     create_param_help,
     create_sub_param_help,
     load_collection_info,
@@ -126,10 +127,11 @@ def treat_media(
             dubbing_suppliers,
             season_number,
         )
-    except AssertionError as e:
+    except Exception as e:
         typer.secho(
-            f'Error: `{str(e)[:15].upper()}{str(e)[15:]}', err=True, fg='red'
+            f'Error: {create_error_message(str(e))}', err=True, fg='red'
         )
+        raise typer.Exit(code=1)
 
 
 @treat_app.command('subtitle')
@@ -198,9 +200,9 @@ def treat_subtitle(
     """
     Fixes subtitle source, file name and language.
     """
-    subcure = Medicure(load_tmdb_info()['api_key'], **load_collection_info())
+    medicure = Medicure(load_tmdb_info()['api_key'], **load_collection_info())
     try:
-        subcure.treat_subtitle(
+        medicure.treat_subtitle(
             imdb_id,
             file_search_pattern_to_id,
             language_code,
@@ -209,7 +211,8 @@ def treat_subtitle(
             include_full_information,
             season_number,
         )
-    except AssertionError as e:
+    except Exception as e:
         typer.secho(
-            f'Error: `{str(e)[:15].upper()}{str(e)[15:]}', err=True, fg='red'
+            f'Error: {create_error_message(str(e))}', err=True, fg='red'
         )
+        raise typer.Exit(code=1)
