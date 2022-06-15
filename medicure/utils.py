@@ -37,7 +37,7 @@ def get_tvshow_info(
     imdb_id: Optional[str] = None,
 ) -> Tuple[str, str, Dict[str, Any]]:
     """
-    Gets correct tvshow info
+    Gets correct TV show info
     """
     tmdb_find_info = _validate_tmdb_info(tmdb_find_info, imdb_id)
     tvshow = tmdb_find_info['tv_results'][0]
