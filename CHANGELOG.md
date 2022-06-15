@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 ### Added
+- Added TMDB mocks to minimize tests' runtime
 - Added `to_list` and `to_dict` converters to `DubbingSupplier` so can be
   easily used in Medicure's CLI.
 - Added tests workflow

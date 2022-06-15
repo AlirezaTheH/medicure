@@ -1,29 +1,20 @@
-import os
 import shutil
-from pathlib import Path
 
 import pytest
+import tmdbsimple as tmdb
 
-
-@pytest.fixture(scope='session')
-def tmdb_api_key() -> str:
-    return os.environ['TMDB_API_KEY']
-
-
-@pytest.fixture(scope='session')
-def movies_directory() -> Path:
-    return Path(__file__).parent / 'data' / 'Movies'
-
-
-@pytest.fixture(scope='session')
-def tvshows_directory() -> Path:
-    return Path(__file__).parent / 'data' / 'TV Shows'
+from tests.parameterize import *
+from tests.tmdb_mocks import FindMock, TVSeasonsMock
 
 
 @pytest.fixture(autouse=True)
-def clean_data_directory(
-    movies_directory: Path, tvshows_directory: Path
-) -> None:
+def mock_tmdb(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(tmdb, 'Find', FindMock)
+    monkeypatch.setattr(tmdb, 'TV_Seasons', TVSeasonsMock)
+
+
+@pytest.fixture(autouse=True)
+def clean_data_directory() -> None:
     yield
 
     for directory in movies_directory.iterdir():
