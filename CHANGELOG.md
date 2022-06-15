@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
 ## [Unreleased]
+
+## [0.2.0] - 2022-06-15
 ### Added
 - Added pre-commit ci support
 - Added Codecov support
@@ -78,7 +80,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - First version of CLI added
 
 
-[Unreleased]: https://github.com/alirezatheh/medicure/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/alirezatheh/medicure/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/alirezatheh/medicure/compare/v0.1.5...v0.2.0
 [0.1.5]: https://github.com/alirezatheh/medicure/compare/v0.0.4...v0.1.5
 [0.0.4]: https://github.com/alirezatheh/medicure/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/alirezatheh/medicure/releases/tag/v0.0.3
