@@ -1,0 +1,113 @@
+Index: __init__.py
+===============================================================================
+--- __init__.py
++++ __init__.py
+@@ -37,3 +37,5 @@ from .models import FileText as FileText
+ from .models import FileTextWrite as FileTextWrite
+ from .params import Argument as Argument
+ from .params import Option as Option
++
++_patched_by_medicure = True
+Index: main.py
+===============================================================================
+--- main.py
++++ main.py
+@@ -627,7 +627,9 @@ def get_click_param(
+     parameter_type: Any = None
+     is_flag = None
+     origin = getattr(main_type, "__origin__", None)
+-    if origin is not None:
++    if parameter_info.param_type:
++        parameter_type = parameter_info.param_type
++    if parameter_type is None and origin is not None:
+         # Handle Optional[SomeType]
+         if origin is Union:
+             types = []
+Index: models.py
+===============================================================================
+--- models.py
++++ models.py
+@@ -173,6 +173,7 @@ def __init__(
+             ]
+         ] = None,
+         autocompletion: Optional[Callable[..., Any]] = None,
++        param_type: Optional[click.ParamType] = None,
+         # TyperArgument
+         show_default: Union[bool, str] = True,
+         show_choices: bool = True,
+@@ -212,6 +213,7 @@ def __init__(
+         self.envvar = envvar
+         self.shell_complete = shell_complete
+         self.autocompletion = autocompletion
++        self.param_type = param_type
+         # TyperArgument
+         self.show_default = show_default
+         self.show_choices = show_choices
+@@ -262,6 +264,7 @@ def __init__(
+             ]
+         ] = None,
+         autocompletion: Optional[Callable[..., Any]] = None,
++        param_type: Optional[click.ParamType] = None,
+         # Option
+         show_default: bool = True,
+         prompt: Union[bool, str] = False,
+@@ -310,6 +313,7 @@ def __init__(
+             envvar=envvar,
+             shell_complete=shell_complete,
+             autocompletion=autocompletion,
++            param_type=param_type,
+             # TyperArgument
+             show_default=show_default,
+             show_choices=show_choices,
+@@ -369,6 +373,7 @@ def __init__(
+             ]
+         ] = None,
+         autocompletion: Optional[Callable[..., Any]] = None,
++        param_type: Optional[click.ParamType] = None,
+         # TyperArgument
+         show_default: Union[bool, str] = True,
+         show_choices: bool = True,
+@@ -409,6 +414,7 @@ def __init__(
+             envvar=envvar,
+             shell_complete=shell_complete,
+             autocompletion=autocompletion,
++            param_type=param_type,
+             # TyperArgument
+             show_default=show_default,
+             show_choices=show_choices,
+Index: params.py
+===============================================================================
+--- params.py
++++ params.py
+@@ -24,6 +24,7 @@ def Option(
+         ]
+     ] = None,
+     autocompletion: Optional[Callable[..., Any]] = None,
++    param_type: Optional[click.ParamType] = None,
+     # Option
+     show_default: bool = True,
+     prompt: Union[bool, str] = False,
+@@ -73,6 +74,7 @@ def Option(
+         envvar=envvar,
+         shell_complete=shell_complete,
+         autocompletion=autocompletion,
++        param_type=param_type,
+         # Option
+         show_default=show_default,
+         prompt=prompt,
+@@ -129,6 +131,7 @@ def Argument(
+         ]
+     ] = None,
+     autocompletion: Optional[Callable[..., Any]] = None,
++    param_type: Optional[click.ParamType] = None,
+     # TyperArgument
+     show_default: Union[bool, str] = True,
+     show_choices: bool = True,
+@@ -172,6 +175,7 @@ def Argument(
+         envvar=envvar,
+         shell_complete=shell_complete,
+         autocompletion=autocompletion,
++        param_type=param_type,
+         # TyperArgument
+         show_default=show_default,
+         show_choices=show_choices,

@@ -15,6 +15,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Medicure now keeps actions up to date with Dependabot
 
 ### Changed
+- Changed typer patch method to use pure patch files.
 - Improved treat tests code coverage
 - Improved extracting episode number from file names
 - Improved saving file tracks' info

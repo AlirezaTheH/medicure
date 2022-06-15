@@ -2,11 +2,7 @@ from typing import Optional
 
 import typer
 
-from medicure.cli.typer_patch import patch_param_type, patched
 from medicure.version import __version__
-
-if not patched():
-    patch_param_type()
 
 app = typer.Typer(
     name='medicure',
