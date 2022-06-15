@@ -41,6 +41,7 @@ setup(
     author='Alireza Hosseini',
     author_email='alirezatheh@gmail.com',
     packages=packages,
+    package_data={'medicure': ['*.patch']},
     entry_points={'console_scripts': ['medicure = medicure.cli:app']},
     keywords=[
         'audio',
