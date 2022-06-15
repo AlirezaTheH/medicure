@@ -9,7 +9,7 @@ movie_imdb_id = 'tt1877830'
 # Peaky Blinders
 tvshow_imdb_id = 'tt2442560'
 
-tmdb_api_key = None
+tmdb_api_key = ''
 
 _collection_directory = Path(__file__).parent / 'data'
 movies_directory = _collection_directory / 'Movies'
