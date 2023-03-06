@@ -1,0 +1,7 @@
+sphinx
+furo
+sphinxcontrib-napoleon
+sphinx-copybutton
+sphinx-click
+docutils
+myst-parser

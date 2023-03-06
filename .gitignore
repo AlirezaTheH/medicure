@@ -20,3 +20,6 @@ build
 
 # Tests
 .coverage
+
+# Sphinx documentation
+docs/_build

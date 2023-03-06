@@ -12,7 +12,7 @@ Index: main.py
 ===============================================================================
 --- main.py
 +++ main.py
-@@ -627,7 +627,9 @@ def get_click_param(
+@@ -735,7 +735,9 @@ def get_click_param(
      parameter_type: Any = None
      is_flag = None
      origin = getattr(main_type, "__origin__", None)

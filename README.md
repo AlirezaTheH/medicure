@@ -5,23 +5,14 @@
 [![PyPI Version](https://img.shields.io/pypi/v/medicure)](https://pypi.python.org/pypi/medicure)
 [![Python Versions](https://img.shields.io/pypi/pyversions/medicure)](https://pypi.org/project/medicure)
 
-Medicure is a cosmetic treatment for your media files: movies, TV shows
-and also their subtitles. Medicure provides a command-line tool and also
-a Python package for you.
+Medicure is a cosmetic treatment for your media files: movies, TV shows and
+also their subtitles. Medicure provides a command-line tool and also a Python
+package for you to properly rename, sort tracks and correct tracks info for
+your files.
 
 ## Name
-The word *medicure* is combination of *media* and the Latin word *cura*
-which means "care".
-
-## Requirements
-- [TMDB](https://www.themoviedb.org) API Key: Medicure uses TMDB's API to get
-  correct info for movies and TV shows. So you need to create a TMDB account
-  and generate an API key inorder to use Medicure.
-- [Mediainfo](https://mediaarea.net/en/MediaInfo): Medicure requires Mediainfo
-  to extract track info from video and audio files.
-- [MKVToolNix](https://mkvtoolnix.download): Medicure uses `mkvmerge` to craete
-  new treated media files. `mkvmerge` is one of the MKVToolNix's command-line
-  tools
+The word *medicure* is combination of *media* and the Latin word *cura* which
+means "care".
 
 ## Installation
 The easiest way to install is from PyPI:
@@ -33,15 +24,25 @@ Alternatively, you can install directly from GitHub:
 pip install git+https://github.com/alirezatheh/medicure.git
 ```
 
-## Simple Example
-In this example we want to treat video files of Season 6 of the famous TV show
-[Peaky Blinders](https://en.wikipedia.org/wiki/Peaky_Blinders_(TV_series))
-downloaded from [PSArips](https://psa.pm).
+## Requirements
+- [TMDB](https://www.themoviedb.org) API Key: Medicure uses TMDB's API to get
+  correct info for movies and TV shows. So you need to create a TMDB account
+  and generate an API key in order to use Medicure.
+- [Mediainfo](https://mediaarea.net/en/MediaInfo): Medicure requires Mediainfo
+  to extract track info from video and audio files.
+- [MKVToolNix](https://mkvtoolnix.download): Medicure uses `mkvmerge` to craete
+  new treated media files. `mkvmerge` is one of the MKVToolNix's command-line
+  tools.
 
-First we search the name of TV show in [TMDB](https://www.themoviedb.org) to
-see season names. In this case season name starts with `Series`. In our
-TV shows directory we create `Peaky Blinders/Series 6` directory and put the
-files there. directory structure will look like this:
+## Simple Example
+In this example we want to treat
+[Peaky Blinders](https://en.wikipedia.org/wiki/Peaky_Blinders_(TV_series))'s
+Season 6 video files, downloaded from [PSArips](https://psa.pm).
+
+First we search for the TV show in [TMDB](https://www.themoviedb.org) to see
+season names. In this case season name starts with `Series`. In our TV shows
+directory we create `Peaky Blinders/Series 6` directory and put the files
+there. Directory structure will look like this:
 ```bash
 TV Shows
 └── Peaky Blinders
@@ -62,30 +63,13 @@ And each file has the following track infos:
 | Audio    |       | English      | Yes     | No     |
 | Subtitle |       | English      | Yes     | No     |
 
+Now we run the following python snippet:
 
-Then we run following python script:
 ```python
 from pathlib import Path
 
 from medicure import Medicure, DubbingSupplier
 
-# In this example we only have one dubbing supplier and that's which
-# contains original audio and subtitle.
-dubbing_suppliers = [
-    DubbingSupplier(
-        name='original',
-        file_id=0,
-        correct_language_code='eng',
-        audio_language_code='eng',
-        subtitle_language_code='eng',
-    ),
-]
-
-file_search_pattern_to_id = {
-    # We have only one file for each episode that can be found by this
-    # pattern.
-    'PSA': 0,
-}
 medicure = Medicure(
     tmdb_api_key='YOUR_TMDB_API_KEY',
     tvshows_directory=Path('path/to/tvshows_directory'),
@@ -93,11 +77,25 @@ medicure = Medicure(
 medicure.treat_media(
     # You can find this in url of TV show in IMDb.
     imdb_id='tt2442560',
-    file_search_pattern_to_id=file_search_pattern_to_id,
+    file_search_patterns=[
+        # We have only one file for each episode that can be found by
+        # this pattern.
+        'PSA',
+    ],
     video_language_code='eng',
     video_source='PSA',
     video_release_format='WEB-DL',
-    dubbing_suppliers=dubbing_suppliers,
+    dubbing_suppliers=[
+        # In this example we only have one dubbing supplier and that's
+        # which contains original audio and subtitle.
+        DubbingSupplier(
+            name='original',
+            file_id=0,
+            correct_language_code='eng',
+            audio_language_code='eng',
+            subtitle_language_code='eng',
+        ),
+    ],
     season_number=6,
 )
 ```
@@ -120,7 +118,7 @@ TV Shows
         ├── Peaky Blinders - S06E05 - The Road to Hell.mkv
         └── Peaky Blinders - S06E06 - Lock and Key.mkv
 ```
-And each file track info:
+And each file track infos:
 
 | Type     | Title      | Language | Default | Forced |
 |----------|------------|----------|---------|--------|
@@ -128,45 +126,28 @@ And each file track info:
 | Audio    |            | English  | Yes     | No     |
 | Subtitle |            | English  | No      | No     |
 
-More in depth examples will be coming soon with Medicure's documentation.
+Let's treat again, this time using Medicure's command-line interface.
 
-### Command-line Interface
-Let's treat the above example using Medicure's command-line
-interface.
-
-Since we're using CLI for the first time, we need to save our
-TMDB API key and TV shows directory locally:
+Since we're using CLI for the first time, we need to save our TMDB API key and
+TV shows directory locally:
 ```bash
 medicure save tmdb-info YOUR_TMDB_API_KEY
 ```
 ```bash
 medicure save collection-info \
-    --tvshows-directory PATH_TO_YOUR_TVSHOWS_DRIECTORY
+--tvshows-directory PATH_TO_YOUR_TVSHOWS_DIRECTORY
 ```
 Now we can run:
 ```bash
 medicure treat media \
-    tt2442560 \
-    '{"PSA": 0}' \
-    eng \
-    PSA \
-    WEB-DL \
-    '[["original", 0, "eng", "eng", "eng"]]' \
-    6
+tt2442560 \
+'["PSA"]' \
+eng \
+PSA \
+WEB-DL \
+'[["original", 0, "eng", "eng", "eng"]]' \
+6
 ```
 
-## Directory Scanning
-- TV shows: As showed above Medicure expects following structure for your
-  TV shows directory:
-  ```bash
-  {Your TV shows directory}
-  └── {TV show name on TMDB}
-      └── {TV show season name on TMDB}
-          └── {Episde files}
-  ```
-- Movies: And for movies directory Medicure expects:
-  ```bash
-  {You movies directory}
-  └── {Movie name on TMDB} - {Movie release year}
-      └── {Movie files}
-  ```
+If you want to learn more about Medicure with more in depth examples you can
+visit Medicure's documentation.
