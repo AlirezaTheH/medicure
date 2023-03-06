@@ -405,7 +405,6 @@ class Medicure:
     def _save_file_tracks_info(self, file_info: FileInfo) -> None:
         media_info = MediaInfo.parse(file_info.path)
         for track in media_info.tracks:
-
             if file_info.id == 0 and track.track_type == 'Video':
                 self._video_track_id = track.track_id - 1
                 continue

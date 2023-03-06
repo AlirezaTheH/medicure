@@ -133,7 +133,6 @@ def create_helps_from(function: Callable) -> Callable:
                     ', you can pass a json-like string for this argument.'
                 )
             elif isinstance(parameter.default.param_type, DataList):
-
                 default_help = (
                     ', for each member of this list have you can pass a '
                     'json-like string containing either list of value lists '
