@@ -10,33 +10,33 @@ class DubbingSupplier:
 
     Attributes
     ----------
-    name: str
+    name:
         Name of dubbing supplier, if dubbing supplier represents
         original audio of movie or TV show this doesn't matter but
         should set to `'original'` for better convenience.
 
-    file_id: int
+    file_id:
         The file id which include dubbing supplier tracks
 
-    correct_language_code: str
+    correct_language_code:
         Correct 3-letter language code for dubbing supplier
         See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
         for available langauge codes.
 
-    audio_language_code: str, optional
+    audio_language_code:
         Current 3-letter language code for audio track
         See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
         for available langauge codes.
 
-    subtitle_language_code: str, optional
+    subtitle_language_code:
         Current 3-letter language code for subtitle track
         See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
         for available langauge codes.
 
-    audio_search_pattern: str, optional
+    audio_search_pattern:
         The search pattern for finding audio track
 
-    subtitle_search_pattern: str, optional
+    subtitle_search_pattern:
         The search pattern for finding subtitle track
     """
 
@@ -63,8 +63,7 @@ class DubbingSupplier:
 
         Returns
         -------
-        result: list[Any]
-            List dubbing supplier
+        List dubbing supplier
         """
         ds_list = []
         last_append_index = 0
@@ -90,8 +89,7 @@ class DubbingSupplier:
 
         Returns
         -------
-        result: dict[str, Any]
-            Dictionary dubbing supplier
+        Dictionary dubbing supplier
         """
 
         ds_dict = {}
@@ -110,9 +108,9 @@ class FileInfo:
 
     Attributes
     ----------
-    path: Path
+    path:
         The file path
-    id: int
+    id:
         The file id
     """
 

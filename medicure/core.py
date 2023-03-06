@@ -3,7 +3,7 @@ import re
 import shutil
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict, Dict, List, Optional
+from typing import DefaultDict, List, Optional
 
 import tmdbsimple as tmdb
 from pymediainfo import MediaInfo, Track
@@ -35,14 +35,14 @@ class Medicure:
 
         Parameters
         ----------
-        tmdb_api_key: str
+        tmdb_api_key:
             Your TMDB API key
 
-        movies_directory: Path, optional
+        movies_directory:
             Your movies' directory, this should be given for treating a
             movie.
 
-        tvshows_directory: Path, optional
+        tvshows_directory:
             Your TV shows' directory, this should be given for treating
             a TV show.
         """
@@ -59,7 +59,7 @@ class Medicure:
     def treat_media(
         self,
         imdb_id: str,
-        file_search_pattern_to_id: Dict[str, int],
+        file_search_patterns: List[str],
         video_language_code: str,
         video_source: str,
         video_release_format: str,
@@ -72,30 +72,30 @@ class Medicure:
 
         Parameters
         ----------
-        imdb_id: str
+        imdb_id:
             IMDb id
 
-        file_search_pattern_to_id: dict[str, int]
-            Dict of patterns for finding files to file ids
+        file_search_patterns:
+            List of patterns for finding files
 
-        video_language_code: str
+        video_language_code:
             3-letter language code for video track
             See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
             for available langauge codes.
 
-        video_source: str
+        video_source:
             Source of the video file; name of encoder or the website
             which video is downloaded from
 
-        video_release_format: str
+        video_release_format:
             Format of the video file eg: Blu-ray, WEBRip, etc. See
             https://en.wikipedia.org/wiki/Pirated_movie_release_types
             for available formats.
 
-        dubbing_suppliers: list[DubbingSupplier]
+        dubbing_suppliers:
             List of possible dubbing suppliers
 
-        season_number: int, optional
+        season_number:
             If `imdb_id` is a TV show, season number should be given.
         """
         self._dubbing_suppliers = dubbing_suppliers
@@ -113,7 +113,7 @@ class Medicure:
             movie_directory = self._movies_directory / movie_name
             self._scan_directory(
                 movie_directory,
-                file_search_pattern_to_id,
+                file_search_patterns,
                 'movie',
                 rf'({self._media_suffix_pattern})'
                 rf'|({self._subtitle_suffix_pattern})',
@@ -151,7 +151,7 @@ class Medicure:
             season_directory = self._tvshows_directory / name / season_name
             self._scan_directory(
                 season_directory,
-                file_search_pattern_to_id,
+                file_search_patterns,
                 'season',
                 rf'({self._media_suffix_pattern})'
                 rf'|({self._subtitle_suffix_pattern})',
@@ -194,7 +194,7 @@ class Medicure:
     def treat_subtitle(
         self,
         imdb_id: str,
-        file_search_pattern_to_id: Dict[str, int],
+        file_search_patterns: List[str],
         language_code: str,
         source: Optional[str] = None,
         release_format: Optional[str] = None,
@@ -206,36 +206,36 @@ class Medicure:
 
         Parameters
         ----------
-        imdb_id: str
+        imdb_id:
             IMDb id
 
-        file_search_pattern_to_id: dict[str, int]
-            Dict of patterns for finding files to file ids
+        file_search_patterns:
+            List of patterns for finding files
 
-        language_code: str
+        language_code:
             3-letter language code for subtitle
             See https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
             for available langauge codes.
 
-        source: str, optional
+        source:
             Source of the subtitle file: name of author or the website
             which subtitle is downloaded from. This should be given only
             when `include_full_information` is `True`.
 
-        release_format: str, optional
+        release_format:
             Format of the video that the subtitle is sync with eg:
             Blu-ray, WEBRip, etc. See
             https://en.wikipedia.org/wiki/Pirated_movie_release_types
             for available formats. This should be given only
             when `include_full_information` is `True`.
 
-        include_full_information: bool
+        include_full_information:
             If set to `True` the subtitle will be converted to mks
             format inorder to save all subtitle information. If set to
             `True`, `source` and `release_format`
             should also be given.
 
-        season_number: int, optional
+        season_number:
             If `imdb_id` is a TV show season number should be given.
         """
         if include_full_information:
@@ -268,7 +268,7 @@ class Medicure:
             movie_directory = self._movies_directory / movie_name
             self._scan_directory(
                 movie_directory,
-                file_search_pattern_to_id,
+                file_search_patterns,
                 'movie',
                 self._subtitle_suffix_pattern,
                 include_full_information,
@@ -313,7 +313,7 @@ class Medicure:
             season_directory = self._tvshows_directory / name / season_name
             self._scan_directory(
                 season_directory,
-                file_search_pattern_to_id,
+                file_search_patterns,
                 'season',
                 self._subtitle_suffix_pattern,
                 include_full_information,
@@ -360,7 +360,7 @@ class Medicure:
     def _scan_directory(
         self,
         directory: Path,
-        file_search_pattern_to_id: Dict[str, int],
+        file_search_patterns: List[str],
         directory_type: str,
         file_suffix_pattern: str,
         include_full_information: bool = True,
@@ -379,7 +379,7 @@ class Medicure:
             if directory_type == 'season':
                 file_infos = file_infos[extract_episode_number(file_name)]
 
-            for pattern in file_search_pattern_to_id:
+            for i, pattern in enumerate(file_search_patterns):
                 if re.search(pattern, str(file_name)) is None:
                     continue
 
@@ -390,7 +390,7 @@ class Medicure:
                 file_infos.append(
                     FileInfo(
                         path=directory / file_name,
-                        id=file_search_pattern_to_id[pattern],
+                        id=i,
                     ),
                 )
                 break
@@ -406,7 +406,7 @@ class Medicure:
         media_info = MediaInfo.parse(file_info.path)
         for track in media_info.tracks:
 
-            if track.track_type == 'Video':
+            if file_info.id == 0 and track.track_type == 'Video':
                 self._video_track_id = track.track_id - 1
                 continue
 
