@@ -4,6 +4,7 @@
 [![pre-commit.ci](https://results.pre-commit.ci/badge/github/AlirezaTheH/medicure/main.svg)](https://results.pre-commit.ci/latest/github/alirezatheh/medicure/main)
 [![PyPI Version](https://img.shields.io/pypi/v/medicure)](https://pypi.python.org/pypi/medicure)
 [![Python Versions](https://img.shields.io/pypi/pyversions/medicure)](https://pypi.org/project/medicure)
+[![Documentation Status](https://readthedocs.org/projects/medicure/badge/?version=latest)](https://medicure.readthedocs.io/en/latest/?badge=latest)
 
 Medicure is a cosmetic treatment for your media files: movies, TV shows and
 also their subtitles. Medicure provides a command-line tool and also a Python
@@ -150,4 +151,4 @@ WEB-DL \
 ```
 
 If you want to learn more about Medicure with more in depth examples you can
-visit Medicure's documentation.
+visit [Medicure's documentation](https://medicure.readthedocs.io).
