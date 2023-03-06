@@ -4,6 +4,10 @@ build:
   os: ubuntu-22.04
   tools:
     python: '3.11'
+  jobs:
+    post_install:
+      - pip install .
+      - medicure
 
 python:
   install:
