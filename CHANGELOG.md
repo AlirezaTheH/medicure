@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 ### Added
+- Added support for Python `3.11`
 - Added Rich integration to beatify CLI outputs
 
 ### Fixed
