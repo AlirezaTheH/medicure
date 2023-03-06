@@ -1,10 +1,14 @@
 import json
 import platform
 import re
+from inspect import signature
 from pathlib import Path
-from typing import Dict
+from typing import Callable, Dict
 
 import typer
+from docstring_parser import parse
+
+from medicure.cli.types import DataList, StringListParamType
 
 
 def get_base_path() -> Path:
@@ -70,35 +74,14 @@ def collection_info_from_json(json_object: Dict[str, str]) -> Dict[str, Path]:
     return {k: Path(v) for k, v in json_object.items()}
 
 
-def create_param_help(
-    *lines: str, internal: bool = False, option: bool = False
-) -> str:
+def create_option(option: str) -> str:
     """
-    Creates a beautiful help message for typer parameter.
+    Creates a CLI option from an option.
     """
-    message = '\b\n\b\n{}\n'.format('\n'.join(lines))
-    if internal:
-        message = message[2:]
-    if option:
-        message = f'{message}\b\n'
-    return message
+    return f'--{option.replace("_", "-")}'
 
 
-def create_sub_param_help(*lines: str) -> str:
-    """
-    Creates a beautiful help message for typer sub-parameter.
-    """
-    return '\b\n{}\n    {}\n'.format(lines[0], '\n    '.join(lines[1:]))
-
-
-def create_flag(flag: str) -> str:
-    """
-    Creates a CLI flag from a flag.
-    """
-    return f'--{flag.replace("_", "-")}'
-
-
-def create_error_message(message: str):
+def create_error_message(message: str) -> str:
     """
     Create a CLI error message from a message.
     """
@@ -108,7 +91,60 @@ def create_error_message(message: str):
         if qs == 'True':
             return 'set'
         elif qs.startswith('include'):
-            return f'`{create_flag(qs)}` flag'
+            return f'`{create_option(qs)}` flag'
         return f'`{qs.upper()}`'
 
     return re.sub(r'`([^`]+)`', replacement, message)
+
+
+def create_cli_text(text: str, cli_function: Callable) -> str:
+    """
+    Creates a CLI suitable text for a CLI function from a core text.
+    """
+
+    def replacement(match: re.Match):
+        qs = match.group(1)
+        if qs == 'True':
+            return 'set'
+        elif isinstance(parameters[qs].default, typer.params.OptionInfo):
+            flag = ' flag' if parameters[qs].annotation == bool else ''
+            return f'`{create_option(qs)}`{flag}'
+        return f'`{qs.upper()}`'
+
+    parameters = signature(cli_function).parameters
+    return re.sub(r'`([^`]+)`', replacement, text)
+
+
+def create_helps_from(function: Callable) -> Callable:
+    """
+    A decorator to create helps for a Typer command's parameters based
+    on parameters' descriptions of a function.
+    """
+
+    def new_command(command: Callable) -> Callable:
+        descriptions = {
+            parameter.arg_name: create_cli_text(parameter.description, command)
+            for parameter in parse(function.__doc__).params
+        }
+        for i, parameter in enumerate(signature(command).parameters.values()):
+            default_help = ''
+            if isinstance(parameter.default.param_type, StringListParamType):
+                default_help = (
+                    ', you can pass a json-like string for this argument.'
+                )
+            elif isinstance(parameter.default.param_type, DataList):
+
+                default_help = (
+                    ', for each member of this list have you can pass a '
+                    'json-like string containing either list of value lists '
+                    'or list of dicts of keyword arguments. See the the '
+                    'available attributes in `medicure.{}`'.format(
+                        parameter.default.param_type.dataclass.__name__,
+                    )
+                )
+            default = command.__defaults__[i]
+            default.help = f'{descriptions[parameter.name]}{default_help}'
+
+        return command
+
+    return new_command

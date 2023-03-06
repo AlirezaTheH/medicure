@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
 ## [Unreleased]
+### Added
+- Added Rich integration to beatify CLI outputs
+
+### Fixed
+- Removed type hints from docstrings
+
 
 ## [0.2.0] - 2022-06-15
 ### Added
@@ -46,10 +52,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   tracks
 - Fixed a bug in extracting `track_id` from subtitle files
 
+
 ## [0.1.5] - 2022-05-28
 ### Added
 - Added [BumpVer](https://github.com/mbarkhau/bumpver) config
-- Add extras requirements
+- Added extras requirements
 - Added `CODE_OF_CONDUCT.md`
 - Added `CHANGELOG.md`
 - Added PyPI labels to `README.md`
@@ -61,8 +68,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Improved Typer patch speed
 
 ### Fixed
-- Add `MANIFEST.in` to include extras requirements in source builds
-- Remove unnecessary exclusion from `pre-commit` excludes
+- Added `MANIFEST.in` to include extras requirements in source builds
+- Removed unnecessary exclusion from `pre-commit` excludes
 - Set minimum Python version to `3.8`
 
 

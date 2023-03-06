@@ -2,10 +2,10 @@ import json
 from pathlib import Path
 from typing import Optional
 
-import typer
+import rich_click.typer as typer
 
 from medicure.cli.base import app
-from medicure.cli.utils import create_param_help, get_base_path
+from medicure.cli.utils import get_base_path
 
 save_app = typer.Typer()
 app.add_typer(save_app, name='save')
@@ -13,9 +13,7 @@ app.add_typer(save_app, name='save')
 
 @save_app.command('tmdb-info')
 def save_tmdb_info(
-    api_key: str = typer.Argument(
-        ..., help=create_param_help(': str', 'The TMDB API key')
-    ),
+    api_key: str = typer.Argument(..., help='The TMDB API key'),
 ) -> None:
     """
     Saves TMDB info on disk.
@@ -41,11 +39,9 @@ def save_collection_info(
         dir_okay=True,
         writable=True,
         allow_dash=True,
-        help=create_param_help(
-            'Directory of your movies, must be given if',
-            '`--tvshows-directory` has been not given.',
-            internal=True,
-            option=True,
+        help=(
+            'Directory of your movies, must be given if `--tvshows-directory` '
+            'has been not given.'
         ),
     ),
     tvshows_directory: Optional[Path] = typer.Option(
@@ -57,11 +53,9 @@ def save_collection_info(
         dir_okay=True,
         writable=True,
         allow_dash=True,
-        help=create_param_help(
-            'Directory of your TV shows, must be given if',
-            '`--movies-directory` has been not given.',
-            internal=True,
-            option=True,
+        help=(
+            'Directory of your TV shows, must be given if `--movies-directory` '
+            'has been not given.'
         ),
     ),
 ) -> None:
