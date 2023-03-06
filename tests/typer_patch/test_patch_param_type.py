@@ -9,7 +9,8 @@ from medicure.typer_patch.core import get_typer_path, patch_param_type
 @pytest.fixture(autouse=True)
 def reinstall_typer() -> None:
     subprocess.run(
-        f'{sys.executable} -m pip install --ignore-installed typer', shell=True
+        f'{sys.executable} -m pip install --ignore-installed typer==0.5.0',
+        shell=True,
     )
 
 

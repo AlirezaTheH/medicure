@@ -28,7 +28,7 @@ video_source = _original_source
 video_release_format = _release_format
 
 _subtitle_file_search_pattern = r'\.srt'
-subtitle_file_search_pattern_to_id = {_subtitle_file_search_pattern: 0}
+subtitle_file_search_patterns = [_subtitle_file_search_pattern]
 subtitle_language_code = _extra_language_code
 subtitle_source = _extra_source
 subtitle_release_format = _release_format
@@ -41,8 +41,8 @@ subtitle_correct_track = Track(
     'No',
 )
 
-media_file_search_pattern_to_id = {r'\.mkv': 0}
-_extra_media_file_search_pattern_to_id = {r'\.mka': 1}
+media_file_search_patterns = [r'\.mkv']
+_extra_media_file_search_patterns = [r'\.mka']
 
 _original_ds_name = 'original'
 _original_ds_args = (
@@ -103,11 +103,11 @@ _correct_extra_subtitle_track = partial(
 )
 
 treat_media_args = (
-    'file_search_pattern_to_id, dubbing_suppliers, correct_tracks',
+    'file_search_patterns, dubbing_suppliers, correct_tracks',
     [
         # Single file with a dummy dubbing supplier
         (
-            media_file_search_pattern_to_id,
+            media_file_search_patterns,
             [
                 # Dummy, won't match with any track.
                 DubbingSupplier(_original_ds_name, 0, _language_code),
@@ -121,10 +121,10 @@ treat_media_args = (
         ),
         # An extra audio file with a dummy dubbing supplier
         (
-            {
-                **media_file_search_pattern_to_id,
-                **_extra_media_file_search_pattern_to_id,
-            },
+            [
+                *media_file_search_patterns,
+                *_extra_media_file_search_patterns,
+            ],
             [
                 DubbingSupplier(*_original_ds_args),
                 # Dummy, won't match with any track.
@@ -140,10 +140,10 @@ treat_media_args = (
         ),
         # An extra subtitle file
         (
-            {
-                **media_file_search_pattern_to_id,
-                _subtitle_file_search_pattern: 1,
-            },
+            [
+                *media_file_search_patterns,
+                _subtitle_file_search_pattern,
+            ],
             [
                 DubbingSupplier(*_original_ds_args),
                 DubbingSupplier(_extra_source, 1, _extra_language_code),
@@ -157,11 +157,11 @@ treat_media_args = (
         ),
         # Extra audio and subtitle files
         (
-            {
-                **media_file_search_pattern_to_id,
-                **_extra_media_file_search_pattern_to_id,
-                _subtitle_file_search_pattern: 2,
-            },
+            [
+                *media_file_search_patterns,
+                *_extra_media_file_search_patterns,
+                _subtitle_file_search_pattern,
+            ],
             [
                 DubbingSupplier(*_original_ds_args),
                 DubbingSupplier(*_extra_audio_ds_args),

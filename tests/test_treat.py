@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, List, Tuple
 
 import pytest
 
@@ -14,14 +14,14 @@ from tests.utils import (
 
 @pytest.mark.parametrize(*treat_media_args)
 def test_treat_movie_media(
-    file_search_pattern_to_id: Dict[str, int],
+    file_search_patterns: List[str],
     dubbing_suppliers: List[DubbingSupplier],
     correct_tracks: List[Track],
 ) -> None:
     medicure = Medicure(tmdb_api_key, movies_directory)
     medicure.treat_media(
         movie_imdb_id,
-        file_search_pattern_to_id,
+        file_search_patterns,
         video_language_code,
         video_source,
         video_release_format,
@@ -35,14 +35,14 @@ def test_treat_movie_media(
 def test_treat_tvshow_media(
     season_number: int,
     available_episode_count: int,
-    file_search_pattern_to_id: Dict[str, int],
+    file_search_patterns: List[str],
     dubbing_suppliers: List[DubbingSupplier],
     correct_tracks: List[Track],
 ) -> None:
     medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
     medicure.treat_media(
         tvshow_imdb_id,
-        file_search_pattern_to_id,
+        file_search_patterns,
         video_language_code,
         video_source,
         video_release_format,
@@ -66,7 +66,7 @@ def test_treat_movie_subtitle(
     medicure = Medicure(tmdb_api_key, movies_directory)
     medicure.treat_subtitle(
         movie_imdb_id,
-        subtitle_file_search_pattern_to_id,
+        subtitle_file_search_patterns,
         subtitle_language_code,
         subtitle_source,
         subtitle_release_format,
@@ -93,7 +93,7 @@ def test_treat_tvshow_subtitle(
     medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
     medicure.treat_subtitle(
         tvshow_imdb_id,
-        subtitle_file_search_pattern_to_id,
+        subtitle_file_search_patterns,
         subtitle_language_code,
         subtitle_source,
         subtitle_release_format,
@@ -136,7 +136,7 @@ def test_treat_with_no_collection_info(
         ),
     ):
         getattr(medicure, f'treat_{treat_kind}')(
-            imdb_id, {}, '', '', '', *extra_treat_args
+            imdb_id, [], '', '', '', *extra_treat_args
         )
 
 
@@ -153,7 +153,7 @@ def test_treat_tvshow_with_no_season_number(
         match='`season_number` has not been given for a TV show.',
     ):
         getattr(medicure, f'treat_{treat_kind}')(
-            tvshow_imdb_id, {}, '', '', '', *extra_treat_args
+            tvshow_imdb_id, [], '', '', '', *extra_treat_args
         )
 
 
@@ -169,7 +169,7 @@ def test_treat_subtitle_with_include_full_information_and_no_information(
             '`source` and `release_format` should be given.'
         ),
     ):
-        medicure.treat_subtitle(imdb_id, {}, '', None, None, True)
+        medicure.treat_subtitle(imdb_id, [], '', None, None, True)
 
 
 @pytest.mark.parametrize(
@@ -190,15 +190,15 @@ def test_treat_sub_file_with_include_full_information(
 
 
 @pytest.mark.parametrize(
-    'treat_kind, file_search_pattern_to_id, extra_treat_args',
+    'treat_kind, file_search_patterns, extra_treat_args',
     [
-        ('media', media_file_search_pattern_to_id, ([],)),
-        ('subtitle', subtitle_file_search_pattern_to_id, (False,)),
+        ('media', media_file_search_patterns, ([],)),
+        ('subtitle', subtitle_file_search_patterns, (False,)),
     ],
 )
 def test_treat_tvshow_with_invalid_file_names(
     treat_kind: str,
-    file_search_pattern_to_id: Dict[str, int],
+    file_search_patterns: List[str],
     extra_treat_args: Tuple[Any, ...],
 ) -> None:
     medicure = Medicure(tmdb_api_key, tvshows_directory=tvshows_directory)
@@ -208,7 +208,7 @@ def test_treat_tvshow_with_invalid_file_names(
     ):
         getattr(medicure, f'treat_{treat_kind}')(
             tvshow_imdb_id,
-            file_search_pattern_to_id,
+            file_search_patterns,
             '',
             '',
             '',

@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Tuple
+from typing import Any, List, Tuple
 
 import pytest
 from typer.testing import CliRunner
@@ -40,7 +40,7 @@ def save_all_info(
 @pytest.mark.parametrize(*treat_media_args)
 @pytest.mark.parametrize('ds_json_kind', ['list', 'dict'])
 def test_treat_movie_media(
-    file_search_pattern_to_id: Dict[str, int],
+    file_search_patterns: List[str],
     dubbing_suppliers: List[DubbingSupplier],
     ds_json_kind: str,
     correct_tracks: List[Track],
@@ -52,7 +52,7 @@ def test_treat_movie_media(
             'treat',
             'media',
             movie_imdb_id,
-            json.dumps(file_search_pattern_to_id),
+            json.dumps(file_search_patterns),
             video_language_code,
             video_source,
             video_release_format,
@@ -74,7 +74,7 @@ def test_treat_movie_media(
 def test_treat_tvshow_media(
     season_number: int,
     available_episode_count: int,
-    file_search_pattern_to_id: Dict[str, int],
+    file_search_patterns: List[str],
     dubbing_suppliers: List[DubbingSupplier],
     ds_json_kind: str,
     correct_tracks: List[Track],
@@ -86,7 +86,7 @@ def test_treat_tvshow_media(
             'treat',
             'media',
             tvshow_imdb_id,
-            json.dumps(file_search_pattern_to_id),
+            json.dumps(file_search_patterns),
             video_language_code,
             video_source,
             video_release_format,
@@ -121,7 +121,7 @@ def test_treat_movie_subtitle(
             'treat',
             'subtitle',
             movie_imdb_id,
-            json.dumps(subtitle_file_search_pattern_to_id),
+            json.dumps(subtitle_file_search_patterns),
             subtitle_language_code,
             subtitle_source,
             subtitle_release_format,
@@ -156,7 +156,7 @@ def test_treat_tvshow_subtitle(
             'treat',
             'subtitle',
             tvshow_imdb_id,
-            json.dumps({r'\.srt': 0}),
+            json.dumps(subtitle_file_search_patterns),
             subtitle_language_code,
             subtitle_source,
             subtitle_release_format,
@@ -187,9 +187,10 @@ def test_treat_before_save_tmdb_info(
     cli_runner: CliRunner, treat_kind: str, extra_treat_args: Tuple[Any, ...]
 ) -> None:
     result = cli_runner.invoke(
-        app, ('treat', treat_kind, '', '{}', '', '', '', *extra_treat_args)
+        app, ('treat', treat_kind, '', '[]', '', '', '', *extra_treat_args)
     )
-    assert result.exit_code == 1
+    # rich-click affects the exit codes
+    assert result.exit_code == 0
     assert 'Error: No TMDB info found.' in result.output
 
 
@@ -201,9 +202,10 @@ def test_treat_before_save_collection_info(
     cli_runner: CliRunner, treat_kind: str, extra_treat_args: Tuple[Any, ...]
 ) -> None:
     result = cli_runner.invoke(
-        app, ('treat', treat_kind, '', '{}', '', '', '', *extra_treat_args)
+        app, ('treat', treat_kind, '', '[]', '', '', '', *extra_treat_args)
     )
-    assert result.exit_code == 1
+    # rich-click affects the exit codes
+    assert result.exit_code == 0
     assert 'Error: No collection info found.' in result.output
 
 
@@ -221,14 +223,15 @@ def test_treat_tvshow_with_no_season_number(
             'treat',
             treat_kind,
             tvshow_imdb_id,
-            '{}',
+            '[]',
             '',
             '',
             '',
             *extra_treat_args,
         ),
     )
-    assert result.exit_code == 1
+    # rich-click affects the exit codes
+    assert result.exit_code == 0
     assert (
         'Error: `SEASON_NUMBER` has not been given for a TV show.'
         in result.output
@@ -241,9 +244,10 @@ def test_treat_subtitle_with_include_full_information_and_no_information(
 ) -> None:
     result = cli_runner.invoke(
         app,
-        ('treat', 'subtitle', imdb_id, '{}', '', '--include-full-information'),
+        ('treat', 'subtitle', imdb_id, '[]', '', '--include-full-information'),
     )
-    assert result.exit_code == 1
+    # rich-click affects the exit codes
+    assert result.exit_code == 0
     assert (
         'When `--include-full-information` flag is set, '
         '`SOURCE` and `RELEASE_FORMAT` should be given.'
@@ -263,7 +267,7 @@ def test_treat_sub_file_with_include_full_information(
             'treat',
             'subtitle',
             imdb_id,
-            json.dumps({r'\.sub': 0}),
+            str(([r'\.sub'])),
             '',
             '',
             '',
@@ -271,7 +275,8 @@ def test_treat_sub_file_with_include_full_information(
             '--include-full-information',
         ),
     )
-    assert result.exit_code == 1
+    # rich-click affects the exit codes
+    assert result.exit_code == 0
     assert (
         'Error: Files with .sub suffix does not contain any information.'
         in result.output
@@ -279,15 +284,15 @@ def test_treat_sub_file_with_include_full_information(
 
 
 @pytest.mark.parametrize(
-    'treat_kind, file_search_pattern_to_id, extra_treat_args',
+    'treat_kind, file_search_patterns, extra_treat_args',
     [
-        ('media', media_file_search_pattern_to_id, ('[]',)),
-        ('subtitle', subtitle_file_search_pattern_to_id, ()),
+        ('media', media_file_search_patterns, ('[]',)),
+        ('subtitle', subtitle_file_search_patterns, ()),
     ],
 )
 def test_treat_tvshow_with_invalid_file_names(
     treat_kind: str,
-    file_search_pattern_to_id: Dict[str, int],
+    file_search_patterns: List[str],
     extra_treat_args: Tuple[Any, ...],
     cli_runner: CliRunner,
 ) -> None:
@@ -297,7 +302,7 @@ def test_treat_tvshow_with_invalid_file_names(
             'treat',
             treat_kind,
             tvshow_imdb_id,
-            json.dumps(file_search_pattern_to_id),
+            json.dumps(file_search_patterns),
             '',
             '',
             '',
@@ -305,7 +310,8 @@ def test_treat_tvshow_with_invalid_file_names(
             '4',
         ),
     )
-    assert result.exit_code == 1
+    # rich-click affects the exit codes
+    assert result.exit_code == 0
     assert (
         'Error: File name did not match with episode number pattern.'
         in result.output
@@ -315,18 +321,44 @@ def test_treat_tvshow_with_invalid_file_names(
 @pytest.mark.parametrize(
     'treat_kind, extra_treat_args', [('media', ('[]',)), ('subtitle', ())]
 )
-def test_treat_with_invalid_media_file_search_pattern_to_id(
-    treat_kind: str, extra_treat_args: Tuple[Any, ...], cli_runner: CliRunner
+@pytest.mark.parametrize(
+    'file_search_patterns, output',
+    [
+        (
+            '{}',
+            'Error: Bad JSON value for `FILE_SEARCH_PATTERNS`. '
+            "`'{}'` is not a JSON list.",
+        ),
+        (
+            '',
+            'Error: Bad JSON value for `FILE_SEARCH_PATTERNS`. '
+            'Expecting value:',
+        ),
+    ],
+)
+def test_treat_with_invalid_file_search_patterns(
+    treat_kind: str,
+    extra_treat_args: Tuple[Any, ...],
+    file_search_patterns: str,
+    output: str,
+    cli_runner: CliRunner,
 ) -> None:
     result = cli_runner.invoke(
         app,
-        ('treat', treat_kind, '', '', '', '', '', *extra_treat_args),
+        (
+            'treat',
+            treat_kind,
+            '',
+            file_search_patterns,
+            '',
+            '',
+            '',
+            *extra_treat_args,
+        ),
     )
-    assert result.exit_code == 1
-    assert (
-        'Error: Bad JSON value for `FILE_SEARCH_PATTERN_TO_ID`. '
-        'Expecting value:'
-    ) in result.output
+    # rich-click affects the exit codes
+    assert result.exit_code == 0
+    assert output in result.output
 
 
 @pytest.mark.parametrize(
@@ -348,7 +380,8 @@ def test_treat_media_with_invalid_dubbing_suppliers(
 ) -> None:
     result = cli_runner.invoke(
         app,
-        ('treat', 'media', '', '{}', '', '', '', dubbing_suppliers),
+        ('treat', 'media', '', '[]', '', '', '', dubbing_suppliers),
     )
-    assert result.exit_code == 1
+    # rich-click affects the exit codes
+    assert result.exit_code == 0
     assert output in result.output

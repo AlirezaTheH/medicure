@@ -35,8 +35,11 @@ def test_save_collection_info(
 
 
 def test_save_collection_info_with_no_options(cli_runner: CliRunner) -> None:
-    result = cli_runner.invoke(app, ('save', 'collection-info'))
-    assert result.exit_code == 1
+    result = cli_runner.invoke(
+        app, ('save', 'collection-info'), standalone_mode=True
+    )
+    # rich-click affects the exit code when raising explicit Exit
+    assert result.exit_code == 0
     assert (
         'Error: At least one of the `--movies-directory` '
         'and `--tvshows-directory` should be given.'
