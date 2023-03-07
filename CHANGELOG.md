@@ -15,6 +15,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 - Removed type hints from docstrings
 - Adjusted CLI tests with Rich integration
+- Fixed Typer's patch issue with PyPI
 
 
 ## [0.2.0] - 2022-06-15

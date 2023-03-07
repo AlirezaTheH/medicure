@@ -3,8 +3,6 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
-packages = find_packages(exclude=['tests*'])
-
 requirements_path = Path('requirements')
 with open(requirements_path / 'main.txt') as f:
     requirements = f.read().split()
@@ -40,8 +38,8 @@ setup(
     },
     author='Alireza Hosseini',
     author_email='alirezatheh@gmail.com',
-    packages=packages,
-    package_data={'medicure': ['*.patch']},
+    packages=find_packages(exclude=['tests*']),
+    include_package_data=True,
     entry_points={'console_scripts': ['medicure = medicure.cli:app']},
     keywords=[
         'audio',
