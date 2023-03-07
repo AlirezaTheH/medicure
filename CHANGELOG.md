@@ -12,6 +12,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added support for Python `3.11`
 - Added Rich integration to beatify CLI outputs
 
+### Changed
+- Updated publish Python version to `3.11`
+
 ### Fixed
 - Removed type hints from docstrings
 - Adjusted CLI tests with Rich integration
