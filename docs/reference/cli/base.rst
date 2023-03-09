@@ -1,2 +1,2 @@
 .. typer:: medicure.cli:app
-   :prog: medicure
+    :prog: medicure
