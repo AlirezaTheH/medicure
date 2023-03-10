@@ -12,7 +12,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Added Medicure's documentation
 - Added support for Python `3.11`
-- Added Rich integration to beatify CLI outputs
+- Added [Rich](https://github.com/Textualize/rich) integration to beatify CLI
+  outputs
 
 ### Changed
 - Updated publish Python version to `3.11`
@@ -26,7 +27,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.2.0] - 2022-06-15
 ### Added
 - Added pre-commit ci support
-- Added Codecov support
+- Added [Codecov](https://about.codecov.io) support
 - Added CLI tests
 - Added TMDB mocks to minimize tests' runtime
 - Added `to_list` and `to_dict` converters to `DubbingSupplier` so can be
@@ -57,8 +58,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed publish workflow's pip caching
 - Fixed a bug in extracting release year for movies
 - Fixed a bug in extracting track info from subtitle files
-- Fixed `mkvmerge`'s `--no-subtitles` flag when dubbing supplier has no subtitle
-  tracks
+- Fixed `mkvmerge`'s `--no-subtitles` flag when dubbing supplier has no
+  subtitle tracks
 - Fixed a bug in extracting `track_id` from subtitle files
 
 
